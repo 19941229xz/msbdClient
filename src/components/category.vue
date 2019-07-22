@@ -70,37 +70,34 @@
 		name: 'category',
 		data() {
 			return {
-				productTypeList: [],
-				productListByCreateTime: [],
-				productListByViewNum: [],
-				productListByOrderCount: [],
-				bannerImg: '',
-				position: 0
+				productTypeList: [],  // 商品分类列表
+				productListByCreateTime: [],  // 商品分类列表
+				productListByViewNum: [],  // 热门商品列表
+				productListByOrderCount: [],  // 热销商品列表
+				bannerImg: '',   // 分类的图片
+				position: 0   //  默认让第一个分类显示点击样式
 			}
 		},
 		methods: {
 			getAllProductType: function() {
 				var that = this
-
 				this.$http({
 					url: "/getAllProducttype",
 					method: 'post',
 					data: {
 						model: {
-
 						},
 						orderParams: [
 							'viewNum desc'
 						],
 						pageNum: 0,
-						pageSize: 1000
+						pageSize: 1000  // 默认1000 商品分类不会太多
 					}
-
 				}).then(function(res) {
 					console.log(res)
-					that.productTypeList = res.data.content.list
+					that.productTypeList = res.data.content.list 
 					that.getProductListByTypeId(that.productTypeList[0].id, 'createTime desc') //默认展示第一个商品分类的商品
-					that.bannerImg = res.data.content.list[0].typeImg
+					that.bannerImg = res.data.content.list[0].typeImg // 默认banner图显示第一个分类的图片
 				}).catch(function(err) {
 					that.$mui.toast('获取商品分类信息失败')
 					console.log(err)
@@ -109,9 +106,11 @@
 			changeType: function(item, index) {
 				// 后台刷新该分类点击量
 				this.addProducttypeViewNum(item.id)
-				
+				//修改banner图
 				this.bannerImg = item.typeImg
+				//修改被点击的分类的active样式
 				this.position = index
+				//根据商品分类id  查询获取相应的商品列表
 				this.getProductListByTypeId(item.id)
 
 
@@ -196,7 +195,7 @@
 				})
 
 			},
-			addProducttypeViewNum:function(typeId){
+			addProducttypeViewNum:function(typeId){  //  刷新分类的浏览量
 				this.$http('/addProducttypeViewNum/'+typeId)
 			}
 		},
