@@ -7,10 +7,10 @@
 			<header class="jd_topBar">
 				<a href="javascript:history.back(-1)" class="icon_back"></a>
 				<form action="#">
-					<input type="search" placeholder="顶部通栏" />
+					<input type="search" placeholder="商品搜索" />
 				</form>
-				<a href="#" class="icon_menu"></a>
 			</header>
+			
 
 			<!-- 分类主体-->
 			<div class="jd_main">
@@ -25,7 +25,7 @@
 						<div class="hot">
 							<h3>新品推荐</h3>
 							<ul class="clearFix">
-								<li v-for="item in productListByCreateTime"><a><img :src="item.productImg" alt="" />
+								<li @click="toProductDetail(item.id)" v-for="item in productListByCreateTime"><a><img :src="item.productImg" alt="" />
 										<p>{{item.productName}}</p>
 									</a></li>
 								<p v-show="productListByCreateTime.length==0" class="noProduct">暂无商品</p>
@@ -35,7 +35,7 @@
 						<div class="hot">
 							<h3>热销商品</h3>
 							<ul class="clearFix">
-								<li v-for="item in productListByOrderCount"><a><img :src="item.productImg" alt="" />
+								<li @click="toProductDetail(item.id)" v-for="item in productListByOrderCount"><a><img :src="item.productImg" alt="" />
 										<p>{{item.productName}}</p>
 									</a></li>
 									<p v-show="productListByOrderCount.length==0" class="noProduct">暂无商品</p>
@@ -45,7 +45,7 @@
 						<div class="hot">
 							<h3>热门商品</h3>
 							<ul class="clearFix">
-								<li v-for="item in productListByViewNum"><a><img :src="item.productImg" alt="" />
+								<li @click="toProductDetail(item.id)" v-for="item in productListByViewNum"><a><img :src="item.productImg" alt="" />
 										<p>{{item.productName}}</p>
 									</a></li>
 									<p v-show="productListByViewNum.length==0" class="noProduct">暂无商品</p>
@@ -197,6 +197,10 @@
 			},
 			addProducttypeViewNum:function(typeId){  //  刷新分类的浏览量
 				this.$http('/addProducttypeViewNum/'+typeId)
+			},
+			toProductDetail:function(productId){ // 跳转到商品详情页面
+				console.log('proId:'+productId)
+				this.$router.push({path:'/productDetail',query:{proId:productId}})
 			}
 		},
 		mounted: function() {

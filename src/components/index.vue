@@ -8,7 +8,7 @@
 					<a href="#" class="icon_logo"></a>
 					<form action="#">
 						<span class="icon_search"></span>
-						<input type="search" placeholder="占位符">
+						<input type="search" placeholder="搜索商品">
 					</form>
 					<a v-if="isLogin=='登出'" id="menu" href="#topPopover" class="login mui-action-menu mui-pull-right">
 						<img v-if="userInfo.headPic==''" src="../../build/logo.png" />

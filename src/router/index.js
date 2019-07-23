@@ -12,6 +12,8 @@ import userCenter from '@/components/userCenter'
 import userEdit from '@/components/userEdit'
 import order from '@/components/order'
 import orderDetail from '@/components/orderDetail'
+import productDetail from '@/components/productDetail'
+
 
 Vue.use(Router)
 
@@ -76,6 +78,11 @@ export default new Router({
 		  path: '/orderDetail',
 		  name: 'orderDetail',
 		  component: orderDetail
+		},
+		{
+		  path: '/productDetail',
+		  name: 'productDetail',
+		  component: productDetail
 		}
 		
   ]
