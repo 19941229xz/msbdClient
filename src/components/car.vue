@@ -5,14 +5,32 @@
 			<a class="mui-icon mui-pull-left" href="javascript:history.back(-1)">
 				<</a> <h1 class="mui-title">购物车</h1>
 		</header>
+		
+		<!-- <ul id="OA_task_1" class="mui-table-view">
+			<li class="mui-table-view-cell">
+				<div class="mui-slider-right mui-disabled">
+					<a class="mui-btn mui-btn-red">删除</a>
+				</div>
+				<div class="mui-slider-handle">
+					左滑显示删除按钮
+				</div>
+			</li>
+		</ul> -->	
 		<ul class="carProList">
-			<li v-for="item in shoppingcarList" class="carProduct">
+			<li v-for="item in shoppingcarList" class="carProduct mui-table-view-cell" >
+				<!-- <div class="mui-slider-right mui-disabled">
+					<a class="mui-btn mui-btn-red">删除</a>
+				</div> -->
+				<div @click="removeCarProById(item.id)" class="mui-slider-right mui-disabled">
+					<a class="mui-btn mui-btn-red">删除</a>
+				</div>
+				<div class="mui-slider-handle">
 				<input @change="calTotalPrice()" type="checkbox" v-model="checkedProd" :value="item.id" />
 				<img :src="item.productImg" />
 				<div class="proInfoAndOption">
 					<ul>
 						<li class="name">{{item.productName}}</li>
-						<li class="miaoshu">{{item.miaoshu}}</li>
+						<li style="overflow: hidden;" :title="item.miaoshu" class="miaoshu">{{item.miaoshu}}</li>
 						<li class="opt">
 							<span v-if="item.isInDiscount==1" class="left">￥{{item.normalPrice}}</span>
 							<span v-if="item.isInDiscount!=1 && item.isInKill!=1" class="left">￥{{item.normalPrice-item.killDiscount-item.discount}}</span>
@@ -25,6 +43,7 @@
 							</span>
 						</li>
 					</ul>
+				</div>
 				</div>
 			</li>
 
@@ -207,6 +226,21 @@
 			toProductDetail:function(productId){ // 跳转到商品详情页面
 				console.log('proId:'+productId)
 				this.$router.push({path:'/productDetail',query:{proId:productId}})
+			},
+			removeCarProById:function(id){
+				var temp = this.shoppingcarList
+				this.shoppingcarList=[]
+				this.$http("/removeShoppingcarById/"+id).then(
+					res=>{
+						if(res.data.code==200){
+							this.$mui.toast('移除成功')
+							this.getShoppingcarListByUserId(this.$userInfo.id)
+						}else{
+							this.$mui.toast('移除失败')
+							this.shoppingcarList=temp
+						}
+					}
+				)
 			}
 		},
 		mounted: function() {
@@ -238,6 +272,7 @@
 		float: left;
 		height: 100%;
 		width: 30%;
+		margin-top: -10px;
 		vertical-align: middle;
 	}
 
@@ -260,6 +295,7 @@
 	.proInfoAndOption ul li {
 		width: 100%;
 		height: 33%;
+		margin-top: -10px;
 		/* border: 1px solid red; */
 	}
 
@@ -273,7 +309,7 @@
 		vertical-align: middle;
 		line-height: 18px;
 		position: relative;
-		margin-top: 40px;
+		margin-top: 30px;
 		margin-left: 3%;
 	}
 
