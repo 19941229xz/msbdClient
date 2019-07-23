@@ -24,7 +24,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="mui-card-footer">
+			<div class="mui-card-footer">   
 				<a class="mui-card-link">快递：{{product.deliveryPrice}}</a>
 				<a class="mui-card-link">销量：{{product.orderCount}}</a>
 				<a class="mui-card-link">{{product.deliveryPlace}}</a>
