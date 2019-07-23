@@ -94,7 +94,6 @@
 					item.productNum--
 				}
 				// 判断商品是否被选中
-				var flag= false  //  默认没有选中商品
 				for(var i=0;i<this.checkedProd.length;i++){
 					if(this.checkedProd[i]==item.id){
 						this.calTotalPrice()
@@ -106,7 +105,6 @@
 					item.productNum++
 				}
 				// 判断商品是否被选中
-				var flag= false  //  默认没有选中商品
 				for(var i=0;i<this.checkedProd.length;i++){
 					if(this.checkedProd[i]==item.id){
 						this.calTotalPrice()
