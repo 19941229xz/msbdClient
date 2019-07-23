@@ -92,6 +92,9 @@ Vue.prototype.$deleteCookie = function(name) {
 		// document.cookie = address + "=" + adss + ";expires=" + exp.toGMTString();
 	}
 }
+// 添加全局用户信息
+Vue.prototype.$userInfo={}
+
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',

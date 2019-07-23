@@ -24,7 +24,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="mui-card-footer">   
+			<div class="mui-card-footer">
 				<a class="mui-card-link">快递：{{product.deliveryPrice}}</a>
 				<a class="mui-card-link">销量：{{product.orderCount}}</a>
 				<a class="mui-card-link">{{product.deliveryPlace}}</a>
@@ -34,13 +34,13 @@
 				<a class="mui-card-link">></a>
 			</div>
 		</div>
-		
+
 		<!-- 宝贝评论 -->
-		
+
 		<!-- 按钮组 -->
 		<div class="carAndOrder">
-			<div align="center" class="car">加入购物车</div>
-			<div align="center" class="order">添加到订单</div>
+			<div @click="addProToCar" align="center" class="car">加入购物车</div>
+			<div align="center" class="order">去结算</div>
 		</div>
 		<!-- <div class="mui-card">
 			<div>
@@ -68,23 +68,75 @@
 		name: 'productDetail',
 		data() {
 			return {
-				product:{}
+				product: {},
+				userInfo: {}
 			}
 		},
 		methods: {
-			getProductById:function(proId){
-				
-				this.$http('/getProductById/'+proId).then(res=>{
+			getProductById: function(proId) {
+
+				this.$http('/getProductById/' + proId).then(res => {
 					console.log(res)
-					this.product=res.data.content
-					
+					this.product = res.data.content
+
+				})
+			},
+			addProToCar: function() {
+
+				var proId = this.product.id
+				var shoppingcarData= this.product
+				
+				delete shoppingcarData.id   //  删除id
+				delete shoppingcarData.createTime
+				
+				
+				shoppingcarData.userId = this.userInfo.id
+				
+				shoppingcarData.productId = proId
+				
+				console.log(shoppingcarData)
+				
+
+				this.$http.post('/addShoppingcar', shoppingcarData).then(res => {
+					console.log(res)
+					if(res.data.code==200){
+						this.$mui.toast('购车添加成功')
+					}else{
+						this.$mui.toast('添加失败')
+					}
+
+				})
+
+			},
+			getUserInfo: function() {
+				var that = this
+
+				this.$http({
+					url: "/getAllUser",
+					method: 'post',
+					data: {
+						model: {
+							"userName": that.$getCookie('userName')
+						},
+						orderParams: [
+
+						],
+						pageNum: 0,
+						pageSize: 5
+					}
+				}).then(function(res) {
+					console.log(res.data.content.list[0])
+					that.userInfo = res.data.content.list[0]
+				}).catch(function(err) {
+					that.$mui.toast('获取用户信息失败')
+					console.log(err)
 				})
 			}
-
 		},
 		mounted() {
 			console.log(this.$route.query.proId)
 			this.getProductById(this.$route.query.proId)
+			this.getUserInfo()
 		}
 
 	}
@@ -136,6 +188,7 @@
 	.carAndOrder {
 		width: 100%;
 		position: fixed;
+		bottom: 0px;
 		height: 50px;
 		font-size: 17px;
 		color: white;
