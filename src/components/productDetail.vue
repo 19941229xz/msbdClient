@@ -8,7 +8,7 @@
 		</header>
 		<div class="mui-card">
 			<!-- <div class="mui-card-header mui-card-media" style="height:40vw;background-image:url(../assets/images/detail02.jpg)"></div> -->
-			<img src="../assets/seckill_1.jpg" />
+			<img :src="product.productImg" />
 			<div class="mui-card-content">
 				<div class="mui-card-content-inner">
 					<p align="left" style="color: #000000;" class="realPrice">

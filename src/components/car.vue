@@ -7,7 +7,7 @@
 		</header>
 		<ul class="carProList">
 			<li v-for="item in shoppingcarList" class="carProduct">
-				<input @change="calTotalPrice()" type="checkbox" v-model="checkedProd" :value="item.id"/>
+				<input @change="calTotalPrice()" type="checkbox" v-model="checkedProd" :value="item.id" />
 				<img :src="item.productImg" />
 				<div class="proInfoAndOption">
 					<ul>
@@ -28,30 +28,57 @@
 				</div>
 			</li>
 
-			<!-- <li class="carProduct">
-
-			</li>
-
-			<li class="carProduct">
-
-			</li> -->
-
-
+			<!-- 购物车为空的 -->
+			<div v-if="shoppingcarList.length==0" class="carEmpty" style="margin-top: 50%;">
+				<p>购物车竟然是空的</p>
+				<p>在忙，也要记得买点什么犒赏自己~</p>
+				<span @click="$router.push('/category')" style="border: 1px solid gray;padding: 7px;border-radius: 5px;">去逛逛</span>
+			</div>
 		</ul>
 
 
-		<div class="calBanner">
-			<span class="left">
-				<input type="checkbox" @change="checkAll"/><span>全选</span>
-			</span>
-			<span class="right2">
-				结算({{checkedProd.length}})
-			</span>
-			<span class="right1">
-				合计：<span style="color: orangered;font-weight: bold;">￥{{totalPrice}}</span>
-			</span>
+		<!-- 推荐商品 -->
+		<h5 v-show="shoppingcarList.length==0" style="background-color:#efeff4;color: orangered;margin-top: 20%;">>>你可能喜欢<<</h5>
+		 <ul v-show="shoppingcarList.length==0" id="tuijian" class="mui-table-view mui-grid-view tuijian" style="margin-bottom: 20%;">
+				<li @click="toProductDetail(item.id)" v-for="item in productListByOrderCount" id="tuijianPro" class="mui-table-view-cell mui-media mui-col-xs-6">
+					<a>
+						<img class="mui-media-object" :src="item.productImg">
+						<div align="left" class="mui-media-body">{{item.productName}}</div>
+						<div align="left" class="mui-media-body">{{item.miaoshu}}</div>
+						<div align="left" class="mui-media-body"><span style="color: orangered;">￥{{item.normalPrice}}</span>&nbsp&nbsp&nbsp销量:{{item.orderCount}}</div>
+					</a></li>
+				<!-- <li id="tuijianPro" class="mui-table-view-cell mui-media mui-col-xs-6">
+					<a href="#">
+						<img class="mui-media-object" src="../assets/seckill_1.jpg">
+						<div class="mui-media-body">想要一间这样的木屋，静静的喝咖啡</div>
+						<div class="mui-media-body">想要一间这样的木屋，静静的喝咖啡</div>
+					</a></li>
+				<li id="tuijianPro" class="mui-table-view-cell mui-media mui-col-xs-6">
+					<a href="#"><img class="mui-media-object" src="../assets/seckill_1.jpg">
+						<div class="mui-media-body">Color of SIP CBD</div>
+						<div class="mui-media-body">想要一间这样的木屋，静静的喝咖啡</div>
+					</a></li>
+				<li id="tuijianPro" class="mui-table-view-cell mui-media mui-col-xs-6">
+					<a href="#">
+						<img class="mui-media-object" src="../assets/seckill_1.jpg">
+						<div class="mui-media-body">静静看这世界</div>
+						<div class="mui-media-body">想要一间这样的木屋，静静的喝咖啡</div>
+					</a></li> -->
+				</ul>
 
-		</div>
+
+				<div class="calBanner">
+					<span class="left">
+						<input type="checkbox" @change="checkAll" /><span>全选</span>
+					</span>
+					<span class="right2">
+						结算({{checkedProd.length}})
+					</span>
+					<span class="right1">
+						合计：<span style="color: orangered;font-weight: bold;">￥{{totalPrice}}</span>
+					</span>
+
+				</div>
 
 	</div>
 
@@ -63,8 +90,9 @@
 		data() {
 			return {
 				shoppingcarList: [],
-				totalPrice:0,
-				checkedProd:[]
+				totalPrice: 0,
+				checkedProd: [],
+				productListByOrderCount:[]    // 热销商品
 			}
 		},
 		methods: {
@@ -84,54 +112,58 @@
 						console.log(res)
 						if (res.data.code == 200) {
 							this.shoppingcarList = res.data.content.list
+							if(this.shoppingcarList.length==0){  // 如果购物车为空 就去请求热销商品
+								this.getProductByOrderCount()
+							}
 						} else {
 							this.$mui.toast('获取购物车信息失败')
 						}
 					})
 			},
-			minus:function(item){
-				if(item.productNum>1){
+			minus: function(item) {
+				if (item.productNum > 1) {
 					item.productNum--
 				}
 				// 判断商品是否被选中
-				for(var i=0;i<this.checkedProd.length;i++){
-					if(this.checkedProd[i]==item.id){
+				for (var i = 0; i < this.checkedProd.length; i++) {
+					if (this.checkedProd[i] == item.id) {
 						this.calTotalPrice()
 					}
 				}
 			},
-			plus:function(item){
-				if(item.productNum<item.deserveNum){
+			plus: function(item) {
+				if (item.productNum < item.deserveNum) {
 					item.productNum++
 				}
 				// 判断商品是否被选中
-				for(var i=0;i<this.checkedProd.length;i++){
-					if(this.checkedProd[i]==item.id){
+				for (var i = 0; i < this.checkedProd.length; i++) {
+					if (this.checkedProd[i] == item.id) {
 						this.calTotalPrice()
 					}
 				}
 			},
-			calTotalPrice:function(){
-				this.totalPrice=0
+			calTotalPrice: function() {
+				this.totalPrice = 0
 				// debugger
-				for(var i=0;i<this.checkedProd.length;i++){
-					
-					var tempProId=this.checkedProd[i]
-					for(var j=0;j<this.shoppingcarList.length;j++){
-						if(tempProId==this.shoppingcarList[j].id){
+				for (var i = 0; i < this.checkedProd.length; i++) {
+
+					var tempProId = this.checkedProd[i]
+					for (var j = 0; j < this.shoppingcarList.length; j++) {
+						if (tempProId == this.shoppingcarList[j].id) {
 							var normalPrice = this.shoppingcarList[j].normalPrice
 							var discount = this.shoppingcarList[j].discount
 							var killDiscount = this.shoppingcarList[j].killDiscount
 							var item = this.shoppingcarList[j]
-							this.totalPrice+= (  normalPrice- (item.isInDiscount==2?discount:0)  -  (item.isInKill==2?killDiscount:0)    )*item.productNum
-							
+							this.totalPrice += (normalPrice - (item.isInDiscount == 2 ? discount : 0) - (item.isInKill == 2 ? killDiscount :
+								0)) * item.productNum
+
 						}
 					}
 				}
 			},
-			checkAll:function(){
+			checkAll: function() {
 				var _this = this
-				if (this.checkedProd.length==this.shoppingcarList.length) {
+				if (this.checkedProd.length == this.shoppingcarList.length) {
 					// 实现反选
 					this.checkedProd = []
 				} else {
@@ -144,6 +176,37 @@
 					})
 				}
 				this.calTotalPrice()
+			},
+			getProductByOrderCount:function(){
+				var that = this
+				//获取热销商品
+				this.$http({
+					url: "/getAllProduct",
+					method: 'post',
+					data: {
+						model: {
+							
+						},
+						orderParams: [
+							'orderCount desc'
+						],
+						pageNum: 0,
+						pageSize: 8
+					}
+				
+				}).then(function(res) {
+					console.log(res)
+					that.productListByOrderCount = res.data.content.list
+					// that.productTypeList = res.data.content.list
+					// that.bannerImg = res.data.content.list[0].typeImg
+				}).catch(function(err) {
+					that.$mui.toast('获取商品列表信息失败')
+					console.log(err)
+				})
+			},
+			toProductDetail:function(productId){ // 跳转到商品详情页面
+				console.log('proId:'+productId)
+				this.$router.push({path:'/productDetail',query:{proId:productId}})
 			}
 		},
 		mounted: function() {
@@ -298,4 +361,11 @@
 		margin-left: 10px;
 		font-weight: bold;
 	}
+
+	/* 推荐商品 */
+
+	/* #tuijianPro {
+		background-color: white;
+		padding: 0px;
+	} */
 </style>
