@@ -71,6 +71,7 @@
 							that.$setCookie('userName',that.userName)
 							that.$mui.toast('登录成功')
 							that.$userInfo=res.data.content
+							console.log(that.$userInfo)
 							that.$router.push('/')
 						}else{
 							that.$mui.toast(res.data.msg)

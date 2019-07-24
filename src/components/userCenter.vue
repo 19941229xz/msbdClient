@@ -118,12 +118,17 @@
 		},
 		filters: {
 			castToPass: function(value) {
-				var len = value.length
-				var res = ''
-				for (var i = 0; i < len; i++) {
-					res += '*'
+				if(typeof(reValue) != undefined){
+					var len = value.length
+					var res = ''
+					for (var i = 0; i < len; i++) {
+						res += '*'
+					}
+					return res
+				}else{
+					return '********'
 				}
-				return res
+				
 			}
 		},
 		mounted: function() {

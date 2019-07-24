@@ -13,6 +13,7 @@ import userEdit from '@/components/userEdit'
 import order from '@/components/order'
 import orderDetail from '@/components/orderDetail'
 import productDetail from '@/components/productDetail'
+import pay from '@/components/pay'
 
 
 Vue.use(Router)
@@ -83,6 +84,11 @@ export default new Router({
 		  path: '/productDetail',
 		  name: 'productDetail',
 		  component: productDetail
+		},
+		{
+		  path: '/pay',
+		  name: 'pay',
+		  component: pay
 		}
 		
   ]

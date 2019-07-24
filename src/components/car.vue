@@ -3,7 +3,7 @@
 	<div>
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-icon mui-pull-left" href="javascript:history.back(-1)">
-				<</a> <h1 class="mui-title">购物车</h1>
+				<</a> <h1 class="mui-title">购物车({{shoppingcarList.length}})</h1>
 		</header>
 		
 		<!-- <ul id="OA_task_1" class="mui-table-view">
@@ -90,7 +90,7 @@
 					<span class="left">
 						<input type="checkbox" @change="checkAll" /><span>全选</span>
 					</span>
-					<span class="right2">
+					<span @click="prePay" class="right2">
 						结算({{checkedProd.length}})
 					</span>
 					<span class="right1">
@@ -241,6 +241,38 @@
 						}
 					}
 				)
+			},
+			prePay:function(){
+				
+				var temp = []
+				// debugger
+				for(var i=0;i<this.shoppingcarList.length;i++){
+					var carProId = this.shoppingcarList[i].id
+						for (var j=0;j<this.checkedProd.length;j++) {
+							if(carProId==this.checkedProd[j]){
+								var shoppingcar = this.shoppingcarList[i]
+								delete shoppingcar.createTime
+								temp.push(shoppingcar)
+							}
+						}
+				}
+				
+				console.log(temp)
+				
+				
+				
+				this.pay(temp)
+			},
+			pay:function(arr){
+				this.$http.post('/pay',arr).then(res=>{
+					if(res.data.code==200){
+						
+						
+						
+						console.log(res.data.content)
+						this.$router.push({path:'/pay',query:{orderId:res.data.content.id}})
+					}
+				})
 			}
 		},
 		mounted: function() {
