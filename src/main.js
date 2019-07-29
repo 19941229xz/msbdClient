@@ -63,7 +63,8 @@ axios.interceptors.response.use(
 
 
 
-axios.defaults.baseURL = 'http://localhost:9091'
+// axios.defaults.baseURL = 'http://47.93.252.104:8080'
+axios.defaults.baseURL = 'http://localhost:8080'
 Vue.prototype.$http = axios
 Vue.prototype.$mui = mui
 Vue.prototype.$getCookie = function(name) {

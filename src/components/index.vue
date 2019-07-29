@@ -197,7 +197,7 @@
 				</section>
 				<section class="jd_product_box">
 					<div class="tit">
-						<h3>京东超市</h3>
+						<h3>微品超市</h3>
 					</div>
 					<div class="con clearFix">
 						<a class="w_50p f_left br" href="#"><img src="../assets/images/cp1.jpg" alt=""></a>
@@ -207,7 +207,7 @@
 				</section>
 				<section class="jd_product_box">
 					<div class="tit">
-						<h3>京东自营</h3>
+						<h3>微品自营</h3>
 					</div>
 					<div class="con clearFix">
 						<a class="w_50p f_right bl" href="#"><img src="../assets/images/cp4.jpg" alt=""></a>
@@ -217,7 +217,7 @@
 				</section>
 				<section class="jd_product_box">
 					<div class="tit">
-						<h3>京东热门</h3>
+						<h3>微品热门</h3>
 					</div>
 					<div class="con clearFix">
 						<a class="w_50p f_left br" href="#"><img src="../assets/images/cp1.jpg" alt=""></a>
