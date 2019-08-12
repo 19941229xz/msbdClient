@@ -41,7 +41,8 @@ exports.cssLoaders = function (options) {
         })
       })
     }
-
+		
+		// 解决图标不显示得问题
     // Extract CSS when that option is specified
     // (which is the case during production build)
     if (options.extract) {
