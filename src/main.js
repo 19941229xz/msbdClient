@@ -7,10 +7,14 @@ import axios from 'axios'
 //配置mui的js  与css
 import mui from '../static/mui/js/mui.min.js'
 import '../static/mui/css/mui.min.css'
+import '../static/mui/css/common.css'
 // 引入layer弹框组建
 import layer from '../static/mui/js/layer.js'
 import '../static/mui/js/need/layer.css'
-
+// 图片预览js
+// import zoom from '../static/mui/js/mui.zoom.js'
+// import previewimage from '../static/mui/js/mui.previewimage.js'
+// 
 Vue.config.productionTip = false
 // // 配置全局layer
 // var loadTip = layer.open({
@@ -18,6 +22,35 @@ Vue.config.productionTip = false
 // 	content: '加载中'
 // });
 // layer.close(loadTip)
+import VeeValidate, {
+	Validator
+} from 'vee-validate';
+import zh_CN from 'vee-validate/dist/locale/zh_CN'
+import VueI18n from 'vue-i18n';
+Vue.use(VueI18n)
+const i18n = new VueI18n({
+	locale: 'zh_CN',
+})
+Validator.extend('mobile', {
+	messages: {
+		en: field => field + '必须是11位手机号码',
+	},
+	validate: value => {
+		return value.length == 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/.test(value)
+	}
+});
+Vue.use(VeeValidate, {
+	// validity: true,
+	aria: true,
+	i18n,
+	i18nRootKey: 'validation',
+	dictionary: {
+		zh_CN
+	}
+});
+
+
+
 
 // 配置axios相关属性
 axios.interceptors.request.use(config => {
@@ -25,6 +58,15 @@ axios.interceptors.request.use(config => {
 		type: 2,
 		content: '加载中'
 	});
+	let userId = Vue.prototype.$getCookie('userId')
+	let routeName = router.currentRoute.name
+	if (userId == null || userId == '') {
+		if (routeName.indexOf('ogin') <= -1) {
+			// setCookie('lastHref', window.location.href, 30 * 60)
+			router.push('/loginAndReg')
+		}
+	}
+	
 	// config.method === 'post' ?
 	// 	config.data = qs.stringify({ ...config.data
 	// 	}) :
@@ -64,7 +106,7 @@ axios.interceptors.response.use(
 
 
 // axios.defaults.baseURL = 'http://47.93.252.104:8080'
-axios.defaults.baseURL = 'http://47.103.23.189:8080'
+axios.defaults.baseURL = 'https://www.bitcoc.top'
 Vue.prototype.$http = axios
 Vue.prototype.$mui = mui
 Vue.prototype.$getCookie = function(name) {
@@ -93,6 +135,14 @@ Vue.prototype.$deleteCookie = function(name) {
 		// document.cookie = address + "=" + adss + ";expires=" + exp.toGMTString();
 	}
 }
+
+var isDev = true
+Vue.prototype.$log = function(log) {
+	if (isDev) {
+		console.log(log)
+	}
+}
+
 // 添加全局用户信息
 Vue.prototype.$userInfo={}
 
