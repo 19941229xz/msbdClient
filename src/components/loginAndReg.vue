@@ -152,7 +152,7 @@
 				userInfo.phoneNum = this.phoneNum
 				userInfo.password = '123456'
 				userInfo.userName = this.phoneNum
-
+				userInfo.status = 3  //  3代表是普通用户  无法使用后台功能
 				// this.userInfo.phoneNum = this.phoneNum
 				// this.userInfo.password = '123456'
 				// this.userInfo.userName = this.phoneNum

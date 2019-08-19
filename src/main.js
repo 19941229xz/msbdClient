@@ -51,13 +51,19 @@ Vue.use(VeeValidate, {
 
 
 
-
+var loadTip = null
+var loadCount = 0
 // 配置axios相关属性
 axios.interceptors.request.use(config => {
-	var loadTip = layer.open({
+	// if (loadTip == null) {
+	loadTip = layer.open({
 		type: 2,
-		content: '加载中'
+		content: '加载中',
+		time: 60
 	});
+	// }
+	// loadCount++
+	//
 	let userId = Vue.prototype.$getCookie('userId')
 	let routeName = router.currentRoute.name
 	if (userId == null || userId == '') {
@@ -66,7 +72,7 @@ axios.interceptors.request.use(config => {
 			router.push('/loginAndReg')
 		}
 	}
-	
+
 	// config.method === 'post' ?
 	// 	config.data = qs.stringify({ ...config.data
 	// 	}) :
@@ -75,32 +81,36 @@ axios.interceptors.request.use(config => {
 	// config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 	return config;
 }, error => { //请求错误处理
-	
+
 	Promise.reject(error)
 });
 
 axios.interceptors.response.use(
-    response => {  //成功请求到数据
-        layer.closeAll()
-        // //这里根据后端提供的数据进行对应的处理
-        // if (response.data.result === 'TRUE') {
-        //     return response.data;
-        // } else {
-        //     app.$vux.toast.show({  //常规错误处理
-        //         type: 'warn',
-        //         text: response.data.data.msg
-        //     });
-        // }
-				return response
-    },
-    error => {  //响应错误处理
-        console.log('error');
-        console.log(error);
-        console.log(JSON.stringify(error));
- 
- 
-        return Promise.reject(error)
-    }
+	response => { //成功请求到数据
+		// loadCount--
+		// if (loadCount == 0) {
+		layer.close(loadTip)
+		// }
+
+		// //这里根据后端提供的数据进行对应的处理
+		// if (response.data.result === 'TRUE') {
+		//     return response.data;
+		// } else {
+		//     app.$vux.toast.show({  //常规错误处理
+		//         type: 'warn',
+		//         text: response.data.data.msg
+		//     });
+		// }
+		return response
+	},
+	error => { //响应错误处理
+		console.log('error');
+		console.log(error);
+		console.log(JSON.stringify(error));
+
+
+		return Promise.reject(error)
+	}
 )
 
 
@@ -144,7 +154,7 @@ Vue.prototype.$log = function(log) {
 }
 
 // 添加全局用户信息
-Vue.prototype.$userInfo={}
+Vue.prototype.$userInfo = {}
 
 /* eslint-disable no-new */
 new Vue({
