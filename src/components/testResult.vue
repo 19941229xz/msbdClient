@@ -38,8 +38,8 @@
 			<div class="mui-card">
 				<div class="">
 					<div class="mui-content-padded clearfix">
-						<h4 class="fl">累计答题：10题</h4>
-						<span class="fr" style="line-height: 30px;">未做题1123题</span>
+						<h4 class="fl">累计答题：{{userAnswerCount}}题</h4>
+						<span class="fr" style="line-height: 30px;">未做题{{totalQuestionCount - userAnswerCount}}题</span>
 					</div>
 					<div class="bar-wrap" id="demo1">
 						<p class="mui-progressbar mui-progressbar-in" data-progress="70"><span></span></p>
@@ -156,7 +156,9 @@
 				score: 0,
 				rightPoint: 0, //  正确率 
 				questionJobTypeSelectedId: 1,
-				questionJobTypeSelectedName: ''
+				questionJobTypeSelectedName: '',
+				totalQuestionCount:0,
+				userAnswerCount:0,
 			}
 		},
 		methods: {
@@ -169,16 +171,16 @@
 					this.score = parseInt(scorePerQues * this.rightCount)
 				}
 				// 计算正确率
-				this.rightPoint = parseInt(this.rightCount / (this.rightCount + this.falseCount)) *100
+				this.rightPoint = (this.rightCount+this.falseCount)==0?0:parseInt(this.rightCount * 100 / (this.rightCount + this.falseCount))
 				//将考试数据保存到服务器
 				var data = {
 					"banjiId": this.$getCookie('banjiId'),
-					"banjiName":this.$getCookie('banjiName'),
+					"banjiName": this.$getCookie('banjiName'),
 					"companyId": this.$getCookie('companyId'),
 					"companyName": this.$getCookie('companyName'),
 					"finishTimeLong": this.examTimeUsed,
 					"finishiDate": new Date(),
-					"isFinished": (this.rightCount+this.falseCount)==this.questionCount?2:1,
+					"isFinished": (this.rightCount + this.falseCount) == this.questionCount ? 2 : 1,
 					"questionJobTypeId": this.questionJobTypeSelectedId,
 					"schoolId": this.$getCookie('schoolId'),
 					"schoolName": this.$getCookie('schoolName'),
@@ -187,7 +189,7 @@
 					"userId": this.$getCookie('userId'),
 					"wrongAnswerCount": this.falseCount
 				}
-				this.$http.post('/msbd/addExamresult',data)
+				this.$http.post('/msbd/addExamresult', data)
 				//
 			},
 			takeExamAgain: function() {
@@ -198,6 +200,43 @@
 						questionJobTypeSelectedName: this.questionJobTypeSelectedName
 					}
 				})
+			},
+			getUserAnswerCount: async function() { //  获取用户累计答题  和 总题数  然后计算出 未做题数  同时计算进度条
+				var data1 = {
+					"model": {
+						isChecked: 2,
+						questionJobTypeId: this.questionJobTypeSelectedId
+					},
+					"orderParams": [
+
+					],
+					"pageNum": 1,
+					"pageSize": 1
+				}
+
+				var res1 = await this.$http.post('/msbd/getAllQuestion', data1)
+				var total = res1.data.content.total
+				//
+				var data2 = {
+					"model": {
+						answerUserId: this.$getCookie('userId'),
+						questionJobTypeId: this.questionJobTypeSelectedId
+					},
+					"orderParams": [
+
+					],
+					"pageNum": 1,
+					"pageSize": 1
+				}
+				var res2 = await this.$http.post('/msbd/getAllUseranserquestion',data2)
+				var userAnswerTotal = res2.data.content.total
+				//
+				this.userAnswerCount = userAnswerTotal
+				this.totalQuestionCount = total
+				//计算进度条
+				var progressbar1 = this.$mui('#demo1');
+				this.$mui(progressbar1).progressbar().setProgress(parseInt(this.userAnswerCount*100/this.totalQuestionCount))
+				
 			},
 			toIndex: function() {
 				this.$router.push('/')
@@ -235,6 +274,8 @@
 			this.questionJobTypeSelectedName = this.$route.query.questionJobTypeSelectedName
 			//
 			this.calTheResult()
+			//
+			this.getUserAnswerCount()
 		}
 
 	}

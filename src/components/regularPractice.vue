@@ -131,8 +131,8 @@
 
 		</div>
 		<div v-show="phoneModel=='Android'" class="androidCtlBtn" style="position: fixed;bottom: 100px;width: 100%;">
-			<span id="preBtn" @click="preQuestion" class="mui-icon mui-icon-arrowthinleft leftBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #0db80d87;border-radius: 35px;float: left;margin-left: 10px;background-color: #3ed01e;color: white;opacity: 0.5;"></span>
-			<span id="nextBtn" @click="nextQuestion" class="mui-icon mui-icon-arrowthinright rightBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #0db80d87;border-radius: 35px;float: right;margin-right: 10px;background-color: #3ed01e;color: white;opacity: 0.5;"></span>
+			<span id="preBtn" @click="preQuestion" class="mui-icon mui-icon-arrowthinleft leftBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: left;margin-left: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
+			<span id="nextBtn" @click="nextQuestion" class="mui-icon mui-icon-arrowthinright rightBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: right;margin-right: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
 		</div>
 	</div>
 
@@ -165,8 +165,8 @@
 				falseCount: 0,
 				changeSpan: null,
 				phoneModel: 'others',
-				tempAnswer:'',
-				localAnswerLog:[]   //  浏览器本地记录答题数据
+				tempAnswer: '',
+				localAnswerLog: [] //  浏览器本地记录答题数据
 			}
 		},
 		methods: {
@@ -175,22 +175,22 @@
 					path: '/login'
 				})
 			},
-			clearLocalAnswerLog:function(){
+			clearLocalAnswerLog: function() {
 				var tempArr = [] // 临时存放其他岗位的答题记录
-				var answerArr = JSON.parse(localStorage.getItem('localAnswerLog'))||[];
+				var answerArr = JSON.parse(localStorage.getItem('localAnswerLog')) || [];
 				for (var i = 0; i < answerArr.length; i++) {
-					if(answerArr[i].questionTypeId != this.questionJobTypeSelectedId){
+					if (answerArr[i].questionTypeId != this.questionJobTypeSelectedId) {
 						tempArr.push(answerArr[i])
 					}
 				}
 				localStorage.removeItem('localAnswerLog')
-				localStorage.setItem('localAnswerLog',JSON.stringify(tempArr))
+				localStorage.setItem('localAnswerLog', JSON.stringify(tempArr))
 				this.falseCount = 0
 				this.rightCount = 0
 				this.questionIndex = 1
 				this.$mui.toast('答题记录清除成功')
 				this.$router.push('/')
-				
+
 			},
 			getQuestion: async function() {
 				var that = this
@@ -205,7 +205,7 @@
 						questionJobTypeId: that.questionJobTypeSelectedId
 					},
 					"orderParams": [
-				
+
 					],
 					"pageNum": 2,
 					"pageSize": that.questionIndex
@@ -214,51 +214,51 @@
 
 				var currentQuestion = res.data.content.list[0]
 				//拿着该题的id 去服务端查询用户答题表中查询 如果已经答过了 索引加1 递归调用
-				var searchData = {
-					"model": {
-						answerUserId: this.$getCookie('userId'),
-						questionId: currentQuestion.id
-					},
-					"orderParams": [
-
-					],
-					"pageNum": 1,
-					"pageSize": 100
-				}
+				// 				var searchData = {
+				// 					"model": {
+				// 						answerUserId: this.$getCookie('userId'),
+				// 						questionId: currentQuestion.id
+				// 					},
+				// 					"orderParams": [
+				// 
+				// 					],
+				// 					"pageNum": 1,
+				// 					"pageSize": 100
+				// 				}
 				// 服务器端查询用户是否回答过本题
-				var res2 = await this.$http.post('/msbd/getAllUseranserquestion', searchData)
+				// var res2 = await this.$http.post('/msbd/getAllUseranserquestion', searchData)
 				// console.log(res2)
-				if (res2.data.content.list.length == 0) {  //  如果用户没回答过这题
-					that.currentQuestion = res.data.content.list[0]
-					// 查询本地答题记录
-					for (var i = 0; i < this.localAnswerLog.length; i++) {
-						if(this.localAnswerLog[i].questionId==that.currentQuestion.id){
-							// 说明该题已经答过了
-							this.isAnswered = true
-							// 显示正确答案和当时答错的答案
-							var userAnswerArr = this.localAnswerLog[i].answer.split('')  // 用户的答案数组
-							for (var j = 0; j < userAnswerArr.length; j++) { // 先显示错误答案
-								if(this.currentQuestion.rightOption.indexOf(userAnswerArr[j])<=-1){
-									document.getElementById(userAnswerArr[j]).style.backgroundColor = 'red'
-									document.getElementById(userAnswerArr[j]).innerHTML = '错'
-								}
-							}
-							var rightArr = this.currentQuestion.rightOption.split('') // 正确答案数组
-							for (var k = 0; k < rightArr.length; k++) {
-								document.getElementById(rightArr[k]).style.backgroundColor = 'greenyellow'
-								document.getElementById(rightArr[k]).innerHTML = '对'
+				// if (res2.data.content.list.length == 0) { //  如果用户没回答过这题
+				that.currentQuestion = res.data.content.list[0]
+				// 查询本地答题记录
+				for (var i = 0; i < this.localAnswerLog.length; i++) {
+					if (this.localAnswerLog[i].questionId == that.currentQuestion.id) {
+						// 说明该题已经答过了
+						this.isAnswered = true
+						// 显示正确答案和当时答错的答案
+						var userAnswerArr = this.localAnswerLog[i].answer.split('') // 用户的答案数组
+						for (var j = 0; j < userAnswerArr.length; j++) { // 先显示错误答案
+							if (this.currentQuestion.rightOption.indexOf(userAnswerArr[j]) <= -1) {
+								document.getElementById(userAnswerArr[j]).style.backgroundColor = 'red'
+								document.getElementById(userAnswerArr[j]).innerHTML = '错'
 							}
 						}
+						var rightArr = this.currentQuestion.rightOption.split('') // 正确答案数组
+						for (var k = 0; k < rightArr.length; k++) {
+							document.getElementById(rightArr[k]).style.backgroundColor = 'greenyellow'
+							document.getElementById(rightArr[k]).innerHTML = '对'
+						}
 					}
-				} else {
-					that.questionIndex++
-					that.getQuestion()
 				}
+				// } else {
+				// 	that.questionIndex++
+				// 	that.getQuestion()
+				// }
 			},
 			toIndex: function() {
 				this.$router.push('/')
 			},
-			chooseOption: function(val, e) {
+			chooseOption: async function(val, e) {
 				if (this.isAnswered == true) {
 					this.$mui.toast('不能再次选择')
 					return
@@ -268,14 +268,42 @@
 				// this.changeSpan = span
 				// span.style.backgroundColor = '#01DBE7'
 				document.getElementById(val).style.backgroundColor = '#01DBE7'
-				if(this.currentQuestion.questionTypeId==1||this.currentQuestion.questionTypeId==2){  // 单选题和判断提的情况
+				if (this.currentQuestion.questionTypeId == 1 || this.currentQuestion.questionTypeId == 2) { // 单选题和判断提的情况
 					if (this.currentQuestion.rightOption == val) {
 						this.$mui.toast('正确')
 						document.getElementById(val).style.backgroundColor = 'greenyellow'
 						document.getElementById(val).innerHTML = '对'
 						this.rightCount++
 						// 答题完毕 记录数据到本地
-						this.localAnswerLog.push({questionId:this.currentQuestion.id,answer:val,isRight:true,questionTypeId:this.questionJobTypeSelectedId})
+						this.localAnswerLog.push({
+							questionId: this.currentQuestion.id,
+							answer: val,
+							isRight: true,
+							questionTypeId: this.questionJobTypeSelectedId
+						})
+						//记录到服务器
+						let data1 = {
+							"model": {
+								"questionId": this.currentQuestion.id
+							},
+							"orderParams": [],
+							"pageNum": 1,
+							"pageSize": 1
+						}
+						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+						if (res.data.content.total == 0) {
+							let data2 = {
+								"answerDate": new Date(),
+								"answerIsRight": 1,
+								"answerUserId": this.$getCookie('userId'),
+								"questionId": this.currentQuestion.id,
+								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+								"questionTypeId": this.currentQuestion.questionTypeId
+							}
+							this.$http.post('/msbd/addUseranserquestion', data2)
+							//
+						}
+						//
 					} else {
 						this.$mui.toast('错误')
 						document.getElementById(val).style.backgroundColor = 'red'
@@ -284,38 +312,130 @@
 						document.getElementById(this.currentQuestion.rightOption).innerHTML = '对'
 						this.falseCount++
 						// 答题完毕 记录数据到本地
-						this.localAnswerLog.push({questionId:this.currentQuestion.id,answer:val,isRight:false,questionTypeId:this.questionJobTypeSelectedId})
+						this.localAnswerLog.push({
+							questionId: this.currentQuestion.id,
+							answer: val,
+							isRight: false,
+							questionTypeId: this.questionJobTypeSelectedId
+						})
+						//记录到服务器
+						let data1 = {
+							"model": {
+								"questionId": this.currentQuestion.id
+							},
+							"orderParams": [],
+							"pageNum": 1,
+							"pageSize": 1
+						}
+						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+						if (res.data.content.total == 0) {
+							let data2 = {
+								"answerDate": new Date(),
+								"answerIsRight": 2,
+								"answerUserId": this.$getCookie('userId'),
+								"questionId": this.currentQuestion.id,
+								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+								"questionTypeId": this.currentQuestion.questionTypeId
+							}
+							this.$http.post('/msbd/addUseranserquestion', data2)
+							//
+						}
+						//
 					}
 					this.isAnswered = true
-					
+
 					// // 存放到浏览器本地缓存中
 					// localStorage.setItem('localAnswerLog',JSON.stringify(this.localAnswerLog));
-				}else if(this.currentQuestion.questionTypeId==3){  //  多选题的情况
-					this.tempAnswer+=val
+				} else if (this.currentQuestion.questionTypeId == 3) { //  多选题的情况
+					//如果是重复选项 再次点击则可以撤回选中状态
+					if (this.tempAnswer.indexOf(val) > -1) {
+						this.tempAnswer = this.tempAnswer.replace(val, '')
+						document.getElementById(val).style.backgroundColor = 'inherit'
+						document.getElementById(val).innerHTML = val
+						return
+					}
+					//
+					this.tempAnswer += val
 					var answerNum = this.currentQuestion.rightOption.length
-					if(this.tempAnswer.length<answerNum){  //  说明还有正确答案没有选择
-						
-					}else{  // 如果选完了  立即判断对错
+					if (this.tempAnswer.length < answerNum) { //  说明还有正确答案没有选择
+
+					} else { // 如果选完了  立即判断对错
 						var answerArr = this.tempAnswer.split('')
-						var rightNum  =  0;
+						var rightNum = 0;
 						for (var i = 0; i < answerArr.length; i++) {
-							if(this.currentQuestion.rightOption.indexOf(answerArr[i])>-1){
+							if (this.currentQuestion.rightOption.indexOf(answerArr[i]) > -1) {
 								rightNum++
-							}else{
+							} else {
 								document.getElementById(answerArr[i]).style.backgroundColor = 'red'
 								document.getElementById(answerArr[i]).innerHTML = '错'
 							}
 						}
-						if(rightNum==answerNum){  //  多选题答案全对的情况
+						if (rightNum == answerNum) { //  多选题答案全对的情况
 							this.$mui.toast('正确')
 							this.rightCount++
 							// 答题完毕 记录数据到本地
-							this.localAnswerLog.push({questionId:this.currentQuestion.id,answer:this.tempAnswer,isRight:true,questionTypeId:this.questionJobTypeSelectedId})
-						}else{
+							this.localAnswerLog.push({
+								questionId: this.currentQuestion.id,
+								answer: this.tempAnswer,
+								isRight: true,
+								questionTypeId: this.questionJobTypeSelectedId
+							})
+							//记录到服务器
+							let data1 = {
+								"model": {
+									"questionId": this.currentQuestion.id
+								},
+								"orderParams": [],
+								"pageNum": 1,
+								"pageSize": 1
+							}
+							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+							if (res.data.content.total == 0) {
+								let data2 = {
+									"answerDate": new Date(),
+									"answerIsRight": 1,
+									"answerUserId": this.$getCookie('userId'),
+									"questionId": this.currentQuestion.id,
+									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+									"questionTypeId": this.currentQuestion.questionTypeId
+								}
+								this.$http.post('/msbd/addUseranserquestion', data2)
+								//
+							}
+							//
+						} else {
 							this.$mui.toast('错误')
 							this.falseCount++
 							// 答题完毕 记录数据到本地
-							this.localAnswerLog.push({questionId:this.currentQuestion.id,answer:this.tempAnswer,isRight:false,questionTypeId:this.questionJobTypeSelectedId})
+							this.localAnswerLog.push({
+								questionId: this.currentQuestion.id,
+								answer: this.tempAnswer,
+								isRight: false,
+								questionTypeId: this.questionJobTypeSelectedId
+							})
+							//记录到服务器
+							let data1 = {
+								"model": {
+									"questionId": this.currentQuestion.id
+								},
+								"orderParams": [],
+								"pageNum": 1,
+								"pageSize": 1
+							}
+							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+							if (res.data.content.total == 0) {
+								let data2 = {
+									"answerDate": new Date(),
+									"answerIsRight": 2,
+									"answerUserId": this.$getCookie('userId'),
+									"questionId": this.currentQuestion.id,
+									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+									"questionTypeId": this.currentQuestion.questionTypeId
+								}
+								this.$http.post('/msbd/addUseranserquestion', data2)
+								//
+							}
+							//
 						}
 						// 显示正确答案
 						var rightAnswerArr = this.currentQuestion.rightOption.split('')
@@ -327,7 +447,7 @@
 					}
 				}
 				// 存放到浏览器本地缓存中
-				localStorage.setItem('localAnswerLog',JSON.stringify(this.localAnswerLog));
+				localStorage.setItem('localAnswerLog', JSON.stringify(this.localAnswerLog));
 			},
 			resetSpanStyle: function() {
 				document.getElementById('A').style.backgroundColor = 'inherit'
@@ -342,14 +462,14 @@
 				document.getElementById('D').style.backgroundColor = 'inherit'
 				document.getElementById('D').innerHTML = 'D'
 			},
-			preQuestion:function(){
+			preQuestion: function() {
 				// 加深按钮背景色
-				document.getElementById('preBtn').style.opacity=0.9
-				document.getElementById('nextBtn').style.opacity=0.9
-				setTimeout(function(){
-					document.getElementById('preBtn').style.opacity=0.5
-					document.getElementById('nextBtn').style.opacity=0.5
-				},2000)
+				document.getElementById('preBtn').style.opacity = 1
+				document.getElementById('nextBtn').style.opacity = 1
+				setTimeout(function() {
+					document.getElementById('preBtn').style.opacity = 0.5
+					document.getElementById('nextBtn').style.opacity = 0.5
+				}, 2000)
 				//
 				this.questionIndex--
 				if (this.questionIndex == 0) {
@@ -361,14 +481,14 @@
 				this.resetSpanStyle()
 				this.getQuestion()
 			},
-			nextQuestion:function(){
+			nextQuestion: function() {
 				// 加深按钮背景色
-				document.getElementById('preBtn').style.opacity=0.8
-				document.getElementById('nextBtn').style.opacity=0.8
-				setTimeout(function(){
-					document.getElementById('preBtn').style.opacity=0.5
-					document.getElementById('nextBtn').style.opacity=0.5
-				},2000)
+				document.getElementById('preBtn').style.opacity = 1
+				document.getElementById('nextBtn').style.opacity = 1
+				setTimeout(function() {
+					document.getElementById('preBtn').style.opacity = 0.5
+					document.getElementById('nextBtn').style.opacity = 0.5
+				}, 2000)
 				//
 				this.questionIndex++
 				if (this.questionIndex > this.questionCount) {
@@ -394,17 +514,7 @@
 					release: false //默认为false，不监听
 				}
 			});
-			// this.$mui.previewImage();
-			var that = this
-			document.getElementById('question').addEventListener("swiperight", function() {
-				console.log('swiperight')
-				console.log(document.getElementById('options'))
-				that.preQuestion()
-			});
-			document.getElementById('question').addEventListener("swipeleft", function() {
-				console.log('swipeleft')
-				that.nextQuestion()
-			});
+
 			// 获取试题类型  和索引值
 			if (this.$route.query.questionIndex == 0) {
 				this.questionIndex = this.$route.query.questionIndex + 1
@@ -421,23 +531,34 @@
 				this.phoneModel = 'Android'
 			} else {
 				this.phoneModel = 'others'
+				// this.$mui.previewImage();
+				var that = this
+				document.getElementById('question').addEventListener("swiperight", function() {
+					console.log('swiperight')
+					console.log(document.getElementById('options'))
+					that.preQuestion()
+				});
+				document.getElementById('question').addEventListener("swipeleft", function() {
+					console.log('swipeleft')
+					that.nextQuestion()
+				});
 			}
 			// 从浏览器本地缓存中读取用户的答题记录
-			this.localAnswerLog = JSON.parse(localStorage.getItem('localAnswerLog'))||[];
+			this.localAnswerLog = JSON.parse(localStorage.getItem('localAnswerLog')) || [];
 			// 本地统计错题数
 			this.falseCount = 0
 			this.rightCount = 0
 			for (var i = 0; i < this.localAnswerLog.length; i++) {
-				if(!this.localAnswerLog[i].isRight&&this.localAnswerLog[i].questionTypeId==this.questionJobTypeSelectedId){
+				if (!this.localAnswerLog[i].isRight && this.localAnswerLog[i].questionTypeId == this.questionJobTypeSelectedId) {
 					this.falseCount++
-				}else if(this.localAnswerLog[i].isRight&&this.localAnswerLog[i].questionTypeId==this.questionJobTypeSelectedId){
+				} else if (this.localAnswerLog[i].isRight && this.localAnswerLog[i].questionTypeId == this.questionJobTypeSelectedId) {
 					this.rightCount++
 				}
 			}
 			this.questionIndex = this.falseCount + this.rightCount == 0 ? 1 : this.falseCount + this.rightCount
 			this.getQuestion()
 			//
-			
+
 		}
 
 	}

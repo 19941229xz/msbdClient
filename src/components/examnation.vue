@@ -131,8 +131,8 @@
 
 		</div>
 		<div v-show="phoneModel=='Android'" class="androidCtlBtn" style="position: fixed;bottom: 100px;width: 100%;">
-			<span id="preBtn" @click="preQuestion" class="mui-icon mui-icon-arrowthinleft leftBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #0db80d87;border-radius: 35px;float: left;margin-left: 10px;background-color: #3ed01e;color: white;opacity: 0.5;"></span>
-			<span id="nextBtn" @click="nextQuestion" class="mui-icon mui-icon-arrowthinright rightBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #0db80d87;border-radius: 35px;float: right;margin-right: 10px;background-color: #3ed01e;color: white;opacity: 0.5;"></span>
+			<span id="preBtn" @click="preQuestion" class="mui-icon mui-icon-arrowthinleft leftBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: left;margin-left: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
+			<span id="nextBtn" @click="nextQuestion" class="mui-icon mui-icon-arrowthinright rightBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: right;margin-right: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
 		</div>
 	</div>
 
@@ -201,8 +201,8 @@
 								falseCount: this.falseCount,
 								questionCount: this.questionCount,
 								rightCount: this.rightCount,
-								questionJobTypeSelectedId:this.questionJobTypeSelectedId,
-								questionJobTypeSelectedName:this.questionJobTypeSelectedName
+								questionJobTypeSelectedId: this.questionJobTypeSelectedId,
+								questionJobTypeSelectedName: this.questionJobTypeSelectedName
 							}
 						})
 
@@ -216,8 +216,8 @@
 									falseCount: that.falseCount,
 									questionCount: that.questionCount,
 									rightCount: that.rightCount,
-									questionJobTypeSelectedId:that.questionJobTypeSelectedId,
-									questionJobTypeSelectedName:that.questionJobTypeSelectedName
+									questionJobTypeSelectedId: that.questionJobTypeSelectedId,
+									questionJobTypeSelectedName: that.questionJobTypeSelectedName
 								}
 							})
 						})
@@ -232,8 +232,8 @@
 								falseCount: that.falseCount,
 								questionCount: that.questionCount,
 								rightCount: that.rightCount,
-								questionJobTypeSelectedId:that.questionJobTypeSelectedId,
-								questionJobTypeSelectedName:that.questionJobTypeSelectedName
+								questionJobTypeSelectedId: that.questionJobTypeSelectedId,
+								questionJobTypeSelectedName: that.questionJobTypeSelectedName
 							}
 						})
 					})
@@ -245,7 +245,7 @@
 				// 获取总试题数
 				var count = await examnationUtil.getQuestionCount('/msbd/getAllQuestion', that.questionJobTypeSelectedId)
 				//
-				this.questionCount = count<=this.questionCount?count:this.questionCount
+				this.questionCount = count <= this.questionCount ? count : this.questionCount
 				//
 				var questionRandomIndex = numUtil.randomIntNumBeginEnd(1, count)
 				while (this.randomIndexArr.indexOf(questionRandomIndex) > -1) {
@@ -274,7 +274,7 @@
 			toIndex: function() {
 				this.$router.push('/')
 			},
-			chooseOption: function(val, e) {
+			chooseOption: async function(val, e) {
 				if (this.isAnswered == true) {
 					this.$mui.toast('不能再次选择')
 					return
@@ -291,6 +291,31 @@
 						this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 						this.questionListThisExam[this.questionIndex - 1].answer = val
 						this.questionListThisExam[this.questionIndex - 1].isRight = true
+						//记录到服务器
+						let data1 = {
+							"model": {
+								"questionId": this.currentQuestion.id
+							},
+							"orderParams": [
+							],
+							"pageNum": 1,
+							"pageSize": 1
+						}
+						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+						if(res.data.content.total == 0){
+							let data2 = {
+								"answerDate": new Date(),
+								"answerIsRight": 1,
+								"answerUserId": this.$getCookie('userId'),
+								"questionId": this.currentQuestion.id,
+								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+								"questionTypeId": this.currentQuestion.questionTypeId
+							}
+							this.$http.post('/msbd/addUseranserquestion', data2)
+							//
+						}
+						//
+						
 					} else {
 						this.$mui.toast('错误')
 						document.getElementById(val).style.backgroundColor = 'red'
@@ -302,12 +327,43 @@
 						this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 						this.questionListThisExam[this.questionIndex - 1].answer = val
 						this.questionListThisExam[this.questionIndex - 1].isRight = false
+						//记录到服务器
+						let data1 = {
+							"model": {
+								"questionId": this.currentQuestion.id
+							},
+							"orderParams": [
+							],
+							"pageNum": 1,
+							"pageSize": 1
+						}
+						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+						if(res.data.content.total == 0){
+							let data2 = {
+								"answerDate": new Date(),
+								"answerIsRight": 2,
+								"answerUserId": this.$getCookie('userId'),
+								"questionId": this.currentQuestion.id,
+								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+								"questionTypeId": this.currentQuestion.questionTypeId
+							}
+							this.$http.post('/msbd/addUseranserquestion', data2)
+							//
+						}
+						//
 					}
 					this.isAnswered = true
 
 					// // 存放到浏览器本地缓存中
 					// localStorage.setItem('localAnswerLog',JSON.stringify(this.localAnswerLog));
 				} else if (this.currentQuestion.questionTypeId == 3) { //  多选题的情况
+					//如果是重复选项 再次点击则可以撤回选中状态
+					if(this.tempAnswer.indexOf(val)>-1){
+						this.tempAnswer = this.tempAnswer.replace(val,'')
+						document.getElementById(val).style.backgroundColor = 'inherit'
+						document.getElementById(val).innerHTML = val
+						return
+					}
 					this.tempAnswer += val
 					var answerNum = this.currentQuestion.rightOption.length
 					if (this.tempAnswer.length < answerNum) { //  说明还有正确答案没有选择
@@ -315,6 +371,7 @@
 					} else { // 如果选完了  立即判断对错
 						var answerArr = this.tempAnswer.split('')
 						var rightNum = 0;
+						//
 						for (var i = 0; i < answerArr.length; i++) {
 							if (this.currentQuestion.rightOption.indexOf(answerArr[i]) > -1) {
 								rightNum++
@@ -323,6 +380,7 @@
 								document.getElementById(answerArr[i]).innerHTML = '错'
 							}
 						}
+						//
 						if (rightNum == answerNum) { //  多选题答案全对的情况
 							this.$mui.toast('正确')
 							this.rightCount++
@@ -330,7 +388,30 @@
 							this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 							this.questionListThisExam[this.questionIndex - 1].answer = this.tempAnswer
 							this.questionListThisExam[this.questionIndex - 1].isRight = true
-
+							//记录到服务器
+							let data1 = {
+								"model": {
+									"questionId": this.currentQuestion.id
+								},
+								"orderParams": [
+								],
+								"pageNum": 1,
+								"pageSize": 1
+							}
+							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+							if(res.data.content.total == 0){
+								let data2 = {
+									"answerDate": new Date(),
+									"answerIsRight": 1,
+									"answerUserId": this.$getCookie('userId'),
+									"questionId": this.currentQuestion.id,
+									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+									"questionTypeId": this.currentQuestion.questionTypeId
+								}
+								this.$http.post('/msbd/addUseranserquestion', data2)
+								//
+							}
+							//
 						} else {
 							this.$mui.toast('错误')
 							this.falseCount++
@@ -338,6 +419,30 @@
 							this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 							this.questionListThisExam[this.questionIndex - 1].answer = this.tempAnswer
 							this.questionListThisExam[this.questionIndex - 1].isRight = false
+							//记录到服务器
+							let data1 = {
+								"model": {
+									"questionId": this.currentQuestion.id
+								},
+								"orderParams": [
+								],
+								"pageNum": 1,
+								"pageSize": 1
+							}
+							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+							if(res.data.content.total == 0){
+								let data2 = {
+									"answerDate": new Date(),
+									"answerIsRight": 2,
+									"answerUserId": this.$getCookie('userId'),
+									"questionId": this.currentQuestion.id,
+									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
+									"questionTypeId": this.currentQuestion.questionTypeId
+								}
+								this.$http.post('/msbd/addUseranserquestion', data2)
+								//
+							}
+							//
 						}
 						// 显示正确答案
 						var rightAnswerArr = this.currentQuestion.rightOption.split('')
@@ -366,8 +471,8 @@
 			},
 			preQuestion: function() {
 				// 加深按钮背景色
-				document.getElementById('preBtn').style.opacity = 0.9
-				document.getElementById('nextBtn').style.opacity = 0.9
+				document.getElementById('preBtn').style.opacity = 1
+				document.getElementById('nextBtn').style.opacity = 1
 				setTimeout(function() {
 					document.getElementById('preBtn').style.opacity = 0.5
 					document.getElementById('nextBtn').style.opacity = 0.5
@@ -412,8 +517,8 @@
 			},
 			nextQuestion: function() {
 				// 加深按钮背景色
-				document.getElementById('preBtn').style.opacity = 0.8
-				document.getElementById('nextBtn').style.opacity = 0.8
+				document.getElementById('preBtn').style.opacity = 1
+				document.getElementById('nextBtn').style.opacity = 1
 				setTimeout(function() {
 					document.getElementById('preBtn').style.opacity = 0.5
 					document.getElementById('nextBtn').style.opacity = 0.5
@@ -496,16 +601,7 @@
 					release: false //默认为false，不监听
 				}
 			});
-			// this.$mui.previewImage();
-			var that = this
-			document.getElementById('question').addEventListener("swiperight", function() {
-				console.log('swiperight')
-				that.preQuestion()
-			});
-			document.getElementById('question').addEventListener("swipeleft", function() {
-				console.log('swipeleft')
-				that.nextQuestion()
-			});
+			
 			// 判断是考试卷还是  官方模拟考试
 			this.questionJobTypeSelectedId = this.$route.query.questionJobTypeSelectedId
 			this.questionJobTypeSelectedName = this.$route.query.questionJobTypeSelectedName
@@ -524,6 +620,16 @@
 				this.phoneModel = 'Android'
 			} else {
 				this.phoneModel = 'others'
+				// this.$mui.previewImage();
+				var that = this
+				document.getElementById('question').addEventListener("swiperight", function() {
+					console.log('swiperight')
+					that.preQuestion()
+				});
+				document.getElementById('question').addEventListener("swipeleft", function() {
+					console.log('swipeleft')
+					that.nextQuestion()
+				});
 			}
 			// 从浏览器本地缓存中读取用户的答题记录
 			// this.localAnswerLog = JSON.parse(localStorage.getItem('localAnswerLog'))||[];
