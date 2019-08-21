@@ -15,6 +15,9 @@ import '../static/mui/js/need/layer.css'
 // import zoom from '../static/mui/js/mui.zoom.js'
 // import previewimage from '../static/mui/js/mui.previewimage.js'
 // 
+
+Vue.prototype.$layer = layer
+
 Vue.config.productionTip = false
 // // 配置全局layer
 // var loadTip = layer.open({
@@ -56,11 +59,11 @@ var loadCount = 0
 // 配置axios相关属性
 axios.interceptors.request.use(config => {
 	// if (loadTip == null) {
-	loadTip = layer.open({
-		type: 2,
-		content: '加载中',
-		time: 60
-	});
+	// loadTip = layer.open({
+	// 	type: 2,
+	// 	content: '加载中',
+	// 	time: 60
+	// });
 	// }
 	// loadCount++
 	//
@@ -89,7 +92,7 @@ axios.interceptors.response.use(
 	response => { //成功请求到数据
 		// loadCount--
 		// if (loadCount == 0) {
-		layer.close(loadTip)
+		// layer.close(loadTip)
 		// }
 
 		// //这里根据后端提供的数据进行对应的处理
@@ -118,6 +121,11 @@ axios.interceptors.response.use(
 // axios.defaults.baseURL = 'http://47.93.252.104:8080'
 axios.defaults.baseURL = 'https://www.bitcoc.top'
 Vue.prototype.$http = axios
+
+//
+// mui.init({
+// 	swipeBack: true //启用右滑关闭功能
+// })
 Vue.prototype.$mui = mui
 Vue.prototype.$getCookie = function(name) {
 	//console.log(name)
@@ -143,6 +151,17 @@ Vue.prototype.$deleteCookie = function(name) {
 		// 这里删除操作其实是将expires过期时间设置为当前时间，使cookie立即过期
 		document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 		// document.cookie = address + "=" + adss + ";expires=" + exp.toGMTString();
+	}
+}
+Vue.prototype.$clearAllCookie = function() {
+	console.log('清除所有cookie')
+	var date = new Date();
+	date.setTime(date.getTime() - 10000);
+	var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+	// console.log("需要删除的cookie名字：" + keys);
+	if (keys) {
+		for (var i = keys.length; i--;)
+			document.cookie = keys[i] + "=0; expire=" + date.toGMTString() + "; path=/";
 	}
 }
 

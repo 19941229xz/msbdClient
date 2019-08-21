@@ -22,9 +22,9 @@
 
 			<button @click="regOrLoginWithPhoneCode" type="button" class="mui-btn mui-btn-block circleBtn">登录/注册</button>
 
-			<div class="mui-row changeLoginMethod">
+			<!-- <div class="mui-row changeLoginMethod">
 				账号密码登录
-			</div>
+			</div> -->
 
 
 
@@ -126,7 +126,6 @@
 					this.$mui.toast('验证码错误,请重试')
 					return
 				}
-
 				this.$validator.validate().then(async (valid) => {
 					var res = await that.$http('/message-server/textMessage/verifyCodeByPhone/' + that.phoneToken + '/' + that.textCode)
 					if (res.data.code == 200) {
@@ -160,12 +159,12 @@
 					if (res.data.code == 200) {
 						// alert('test')
 						that.$setCookie('userId', res.data.content.id, 24 * 60 * 60)
-						// that.$setCookie('companyId', res.data.content.companyId, 30 * 60)
-						// that.$setCookie('schoolId', res.data.content.schoolId, 30 * 60)
-						// that.$setCookie('realName', res.data.content.realName, 30 * 60)
-						// that.$setCookie('roleId', res.data.content.roleId, 30 * 60)
-						// that.$setCookie('headImg', res.data.content.headImg, 30 * 60)
-						// that.$setCookie('nickName', res.data.content.nickName, 30 * 60)
+						that.$setCookie('companyId', res.data.content.companyId, 24 * 60 * 60)
+						that.$setCookie('schoolId', res.data.content.schoolId, 24 * 60 * 60)
+						that.$setCookie('realName', res.data.content.realName, 24 * 60 * 60)
+						that.$setCookie('roleId', res.data.content.roleId, 24 * 60 * 60)
+						that.$setCookie('headImg', res.data.content.headImg, 24 * 60 * 60)
+						that.$setCookie('nickName', res.data.content.nickName, 24 * 60 * 60)
 						that.$mui.toast('注册成功，马上跳转应用首页...')
 						setTimeout(function() {
 							that.$router.push('/')
@@ -193,6 +192,12 @@
 				this.$http.post('/user-server/getAllUser', searchData).then(res => {
 					if (res.data.code == 200 && res.data.content.list.length == 1) {
 						this.$setCookie('userId', res.data.content.list[0].id, 24 * 60 * 60)
+						this.$setCookie('companyId', res.data.content.list[0].companyId, 24 * 60 * 60)
+						this.$setCookie('schoolId', res.data.content.list[0].schoolId, 24 * 60 * 60)
+						this.$setCookie('realName', res.data.content.list[0].realName, 24 * 60 * 60)
+						this.$setCookie('roleId', res.data.content.list[0].roleId, 24 * 60 * 60)
+						this.$setCookie('headImg', res.data.content.list[0].headImg, 24 * 60 * 60)
+						this.$setCookie('nickName', res.data.content.list[0].nickName, 24 * 60 * 60)
 						this.$router.push('/')
 					} else {
 						this.$mui.toast('登录失败')

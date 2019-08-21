@@ -66,10 +66,11 @@
 							<p>{{questionDone}}/{{questionCount}}</p>
 						</div>
 					</div>
-					<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4 no-border">
-						<a href="#">
-							<span class="mui-icon mui-icon-home"></span>
+					<li @click="toExampaperList" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4 no-border">
+						<a href="javascript:;">
+							<span class="mui-icon mui-icon-home"><span class="mui-badge mui-badge-blue">新功能</span></span>
 							<div class="mui-media-body">专项练习</div>
+							
 						</a>
 					</li>
 					<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" style="border:none;">
@@ -156,6 +157,12 @@
 			</div>
 
 			<ul class="mui-table-view mui-grid-view mui-grid-9">
+				<li @click="toRankList" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="javascript:void(0)">
+						<div class="mui-media-body">我的排行</div>
+						<span class="mui-icon mui-icon-home"><span class="mui-badge mui-badge-blue">新功能</span></span>
+					</a>
+				</li>
 				<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#">
 						<div class="mui-media-body">我的收藏</div>
@@ -172,17 +179,10 @@
 				</li>
 				<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#">
-						<div class="mui-media-body">语音读题</div>
+						<div class="mui-media-body">用户中心</div>
 						<span class="mui-icon mui-icon-home"></span>
 					</a>
 				</li>
-				<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
-						<div class="mui-media-body">我的排行</div>
-						<span class="mui-icon mui-icon-home"></span>
-					</a>
-				</li>
-
 			</ul>
 		</div>
 
@@ -212,6 +212,24 @@
 				// console.log('test')
 				// this.$router.push({path:'/login'})
 				this.$mui.toast('开发中敬请期待')
+			},
+			toRankList:function(){
+				this.$router.push({
+					path:'/rankList',
+					query:{
+						questionJobTypeSelectedId:this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName:this.questionJobTypeSelectedName
+					}
+				})
+			},
+			toExampaperList:function(){
+				this.$router.push({
+					path:'/exampaperList',
+					query:{
+						questionJobTypeSelectedId:this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName:this.questionJobTypeSelectedName
+					}
+				})
 			},
 			getquestionjobtypeList: function() {
 				var that = this
@@ -372,7 +390,7 @@
 					"pageSize": 1
 				}
 				var that = this
-				this.$http.post('/msbd/getAllExamresult',data).then(res=>{
+				this.$http.post('/msbd/getAllBestexamresult',data).then(res=>{
 					// var score = res.data.content.list[0].score
 					var score = typeof(res.data.content.list[0])=='undefined'?0:res.data.content.list[0].score
 					if(score==0){

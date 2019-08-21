@@ -157,8 +157,10 @@
 				rightPoint: 0, //  正确率 
 				questionJobTypeSelectedId: 1,
 				questionJobTypeSelectedName: '',
-				totalQuestionCount:0,
-				userAnswerCount:0,
+				totalQuestionCount: 0,
+				userAnswerCount: 0,
+				exampaperId: 0,
+				exampaperName: '',
 			}
 		},
 		methods: {
@@ -171,9 +173,110 @@
 					this.score = parseInt(scorePerQues * this.rightCount)
 				}
 				// 计算正确率
-				this.rightPoint = (this.rightCount+this.falseCount)==0?0:parseInt(this.rightCount * 100 / (this.rightCount + this.falseCount))
+				this.rightPoint = (this.rightCount + this.falseCount) == 0 ? 0 : parseInt(this.rightCount * 100 / (this.rightCount +
+					this.falseCount))
 				//将考试数据保存到服务器
-				var data = {
+				//判断本次成绩是不是最好成绩
+				var data1 = {
+					"model": {
+						userId: this.$getCookie('userId'),
+						questionJobTypeId:this.questionJobTypeSelectedId
+					},
+					"orderParams": [
+						'score desc',
+						'finishTimeLong asc'
+					],
+					"pageNum": 1,
+					"pageSize": 1
+				}
+				var res1 = await this.$http.post('/msbd/getAllBestexamresult', data1)
+				if (res1.data.content.list.length == 0) { // 还没有任何成绩
+					if (this.exampaperId == 0) { // 如果做得是试卷  不计入排行榜成绩
+						var data = {
+							"banjiId": this.$getCookie('banjiId'),
+							"banjiName": this.$getCookie('banjiName'),
+							"companyId": this.$getCookie('companyId'),
+							"companyName": this.$getCookie('companyName'),
+							"finishTimeLong": this.examTimeUsed,
+							"finishiDate": new Date(),
+							"isFinished": (this.rightCount + this.falseCount) == this.questionCount ? 2 : 1,
+							"questionJobTypeId": this.questionJobTypeSelectedId,
+							"schoolId": this.$getCookie('schoolId'),
+							"schoolName": this.$getCookie('schoolName'),
+							"score": this.score,
+							"totalQuestionCount": this.questionCount,
+							"userId": this.$getCookie('userId'),
+							"wrongAnswerCount": this.falseCount,
+							"userName": this.$getCookie('userName'),
+							"userNickName": this.$getCookie('nickName'),
+							"userRealName": this.$getCookie('realName'),
+							"userHeadImg": this.$getCookie('headImg'),
+							"wrongAnswerCount": this.falseCount
+						}
+						this.$http.post('/msbd/addBestexamresult', data)
+					}
+
+				} else {
+					if (this.exampaperId == 0) { // 如果做得是试卷  不计入排行榜成绩
+						var bestGrade = res1.data.content.list[0]
+						if (this.score > bestGrade.score) { // 如果本次成绩大于最好成绩 删除数据库中的最好成绩  并插入最新好成绩
+							var data = {
+								"banjiId": this.$getCookie('banjiId'),
+								"banjiName": this.$getCookie('banjiName'),
+								"companyId": this.$getCookie('companyId'),
+								"companyName": this.$getCookie('companyName'),
+								"finishTimeLong": this.examTimeUsed,
+								"finishiDate": new Date(),
+								"isFinished": (this.rightCount + this.falseCount) == this.questionCount ? 2 : 1,
+								"questionJobTypeId": this.questionJobTypeSelectedId,
+								"schoolId": this.$getCookie('schoolId'),
+								"schoolName": this.$getCookie('schoolName'),
+								"score": this.score,
+								"totalQuestionCount": this.questionCount,
+								"userId": this.$getCookie('userId'),
+								"wrongAnswerCount": this.falseCount,
+								"userName": this.$getCookie('userName'),
+								"userNickName": this.$getCookie('nickName'),
+								"userRealName": this.$getCookie('realName'),
+								"userHeadImg": this.$getCookie('headImg'),
+								"wrongAnswerCount": this.falseCount
+							}
+							await this.$http('/msbd/removeBestexamresultById/' + bestGrade.id)
+							this.$http.post('/msbd/addBestexamresult', data)
+						} else if (this.score == bestGrade.score) {
+							if (this.exampaperId == 0) { // 如果做得是试卷  不计入排行榜成绩
+								if (this.examTimeUsed < bestGrade.finishTimeLong) { // 如果成绩相同 比时间 时间短的话 删除数据库中的最好成绩  并插入最新好成绩
+									var data = {
+										"banjiId": this.$getCookie('banjiId'),
+										"banjiName": this.$getCookie('banjiName'),
+										"companyId": this.$getCookie('companyId'),
+										"companyName": this.$getCookie('companyName'),
+										"finishTimeLong": this.examTimeUsed,
+										"finishiDate": new Date(),
+										"isFinished": (this.rightCount + this.falseCount) == this.questionCount ? 2 : 1,
+										"questionJobTypeId": this.questionJobTypeSelectedId,
+										"schoolId": this.$getCookie('schoolId'),
+										"schoolName": this.$getCookie('schoolName'),
+										"score": this.score,
+										"totalQuestionCount": this.questionCount,
+										"userId": this.$getCookie('userId'),
+										"wrongAnswerCount": this.falseCount,
+										"userName": this.$getCookie('userName'),
+										"userNickName": this.$getCookie('nickName'),
+										"userRealName": this.$getCookie('realName'),
+										"userHeadImg": this.$getCookie('headImg'),
+										"wrongAnswerCount": this.falseCount
+									}
+									await this.$http('/msbd/removeBestexamresultById/' + bestGrade.id)
+									this.$http.post('/msbd/addBestexamresult', data)
+								}
+							}
+						}
+					}
+
+				}
+				// 添加考试数据
+				var data3 = {
 					"banjiId": this.$getCookie('banjiId'),
 					"banjiName": this.$getCookie('banjiName'),
 					"companyId": this.$getCookie('companyId'),
@@ -187,9 +290,16 @@
 					"score": this.score,
 					"totalQuestionCount": this.questionCount,
 					"userId": this.$getCookie('userId'),
-					"wrongAnswerCount": this.falseCount
+					"wrongAnswerCount": this.falseCount,
+					"userName": this.$getCookie('userName'),
+					"userNickName": this.$getCookie('nickName'),
+					"userRealName": this.$getCookie('realName'),
+					"userHeadImg": this.$getCookie('headImg'),
+					"wrongAnswerCount": this.falseCount,
+					"exampaperId": this.exampaperId,
+					"exampaperName": this.exampaperName
 				}
-				this.$http.post('/msbd/addExamresult', data)
+				this.$http.post('/msbd/addExamresult', data3)
 				//
 			},
 			takeExamAgain: function() {
@@ -228,15 +338,15 @@
 					"pageNum": 1,
 					"pageSize": 1
 				}
-				var res2 = await this.$http.post('/msbd/getAllUseranserquestion',data2)
+				var res2 = await this.$http.post('/msbd/getAllUseranserquestion', data2)
 				var userAnswerTotal = res2.data.content.total
 				//
 				this.userAnswerCount = userAnswerTotal
 				this.totalQuestionCount = total
 				//计算进度条
 				var progressbar1 = this.$mui('#demo1');
-				this.$mui(progressbar1).progressbar().setProgress(parseInt(this.userAnswerCount*100/this.totalQuestionCount))
-				
+				this.$mui(progressbar1).progressbar().setProgress(parseInt(this.userAnswerCount * 100 / this.totalQuestionCount))
+
 			},
 			toIndex: function() {
 				this.$router.push('/')
@@ -272,6 +382,9 @@
 			//
 			this.questionJobTypeSelectedId = this.$route.query.questionJobTypeSelectedId
 			this.questionJobTypeSelectedName = this.$route.query.questionJobTypeSelectedName
+			//  看是否是考的试卷
+			this.exampaperId = this.$route.query.exampaperId
+			this.exampaperName = this.$route.query.exampaperName
 			//
 			this.calTheResult()
 			//
