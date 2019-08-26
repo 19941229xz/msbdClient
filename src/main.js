@@ -11,29 +11,22 @@ import '../static/mui/css/common.css'
 // 引入layer弹框组建
 import layer from '../static/mui/js/layer.js'
 import '../static/mui/js/need/layer.css'
-// 图片预览js
-// import zoom from '../static/mui/js/mui.zoom.js'
-// import previewimage from '../static/mui/js/mui.previewimage.js'
-// 
-
+// 引入手机端弹层插件 主要用来显示加载等待状态
 Vue.prototype.$layer = layer
-
+// vue默认配置
 Vue.config.productionTip = false
-// // 配置全局layer
-// var loadTip = layer.open({
-// 	type: 2,
-// 	content: '加载中'
-// });
-// layer.close(loadTip)
+// 表单校验插件
 import VeeValidate, {
 	Validator
 } from 'vee-validate';
+// 表单校验提示中文支持
 import zh_CN from 'vee-validate/dist/locale/zh_CN'
 import VueI18n from 'vue-i18n';
 Vue.use(VueI18n)
 const i18n = new VueI18n({
 	locale: 'zh_CN',
 })
+// 增加自定义手机号格式验证
 Validator.extend('mobile', {
 	messages: {
 		en: field => field + '必须是11位手机号码',
@@ -51,82 +44,44 @@ Vue.use(VeeValidate, {
 		zh_CN
 	}
 });
-
-
-
-var loadTip = null
-var loadCount = 0
-// 配置axios相关属性
+//
+// 配置axios相关属性  发送请求时的拦截
 axios.interceptors.request.use(config => {
-	// if (loadTip == null) {
-	// loadTip = layer.open({
-	// 	type: 2,
-	// 	content: '加载中',
-	// 	time: 60
-	// });
-	// }
-	// loadCount++
-	//
+	// 每次请求发送前去检查userId 如果不存在说明本次登录已经过期
 	let userId = Vue.prototype.$getCookie('userId')
+	//获取当前页面的路由名称
 	let routeName = router.currentRoute.name
-	if (userId == null || userId == '') {
+	if (userId == null || userId == '') { //登录过期且不再登录页 跳转到登录页
 		if (routeName.indexOf('ogin') <= -1) {
-			// setCookie('lastHref', window.location.href, 30 * 60)
 			router.push('/loginAndReg')
 		}
 	}
-
-	// config.method === 'post' ?
-	// 	config.data = qs.stringify({ ...config.data
-	// 	}) :
-	// 	config.params = { ...config.params
-	// 	};
-	// config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 	return config;
-}, error => { //请求错误处理
-
+}, error => { //请求错误处理  暂时不做处理
+	console.log('请求错误');
+	console.log(error)
+	console.log(JSON.stringify(error));
 	Promise.reject(error)
 });
-
+// 接受返回时的拦截
 axios.interceptors.response.use(
 	response => { //成功请求到数据
-		// loadCount--
-		// if (loadCount == 0) {
-		// layer.close(loadTip)
-		// }
-
-		// //这里根据后端提供的数据进行对应的处理
-		// if (response.data.result === 'TRUE') {
-		//     return response.data;
-		// } else {
-		//     app.$vux.toast.show({  //常规错误处理
-		//         type: 'warn',
-		//         text: response.data.data.msg
-		//     });
-		// }
 		return response
 	},
 	error => { //响应错误处理
-		console.log('error');
+		console.log('响应错误');
 		console.log(error);
 		console.log(JSON.stringify(error));
-
-
 		return Promise.reject(error)
 	}
 )
 
-
-
-// axios.defaults.baseURL = 'http://47.93.252.104:8080'
+// 配置网关路径
 axios.defaults.baseURL = 'https://www.bitcoc.top'
 Vue.prototype.$http = axios
-
 //
-// mui.init({
-// 	swipeBack: true //启用右滑关闭功能
-// })
 Vue.prototype.$mui = mui
+//cookie操作
 Vue.prototype.$getCookie = function(name) {
 	//console.log(name)
 	var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
@@ -164,17 +119,15 @@ Vue.prototype.$clearAllCookie = function() {
 			document.cookie = keys[i] + "=0; expire=" + date.toGMTString() + "; path=/";
 	}
 }
-
+// 日志开关
 var isDev = true
 Vue.prototype.$log = function(log) {
 	if (isDev) {
 		console.log(log)
 	}
 }
-
 // 添加全局用户信息
 Vue.prototype.$userInfo = {}
-
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',

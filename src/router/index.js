@@ -9,6 +9,7 @@ import rankList from '@/components/rankList'
 import exampaperList from '@/components/exampaperList'
 import preTest from '@/components/preTest'
 import wrongPractice from '@/components/wrongPractice'
+import collectionPractice from '@/components/collectionPractice'
 
 
 Vue.use(Router)
@@ -61,6 +62,11 @@ export default new Router({
 			path: '/wrongPractice',
 			name: 'wrongPractice',
 			component: wrongPractice
+		},
+		{
+			path: '/collectionPractice',
+			name: 'collectionPractice',
+			component: collectionPractice
 		}
 
 

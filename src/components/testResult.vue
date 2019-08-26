@@ -303,13 +303,27 @@
 				//
 			},
 			takeExamAgain: function() {
-				this.$router.push({
-					path: '/examnation',
-					query: {
-						questionJobTypeSelectedId: this.questionJobTypeSelectedId,
-						questionJobTypeSelectedName: this.questionJobTypeSelectedName
-					}
-				})
+				// 判断是否考的是试卷
+				if(this.exampaperId==0){
+					this.$router.push({
+						path: '/examnation',
+						query: {
+							questionJobTypeSelectedId: this.questionJobTypeSelectedId,
+							questionJobTypeSelectedName: this.questionJobTypeSelectedName
+						}
+					})
+				}else{
+					this.$router.push({
+						path:'/preTest',
+						query:{
+							exampaperId:this.exampaperId,
+							questionJobTypeSelectedId:this.questionJobTypeSelectedId,
+							questionJobTypeSelectedName:this.questionJobTypeSelectedName
+						}
+					})
+				}
+				
+				
 			},
 			getUserAnswerCount: async function() { //  获取用户累计答题  和 总题数  然后计算出 未做题数  同时计算进度条
 				var data1 = {

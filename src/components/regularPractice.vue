@@ -122,6 +122,7 @@
 			<nav class="my_form">
 
 				<a @click="clearLocalAnswerLog" href="javascript:;"><span style="font-size: 14px;" class="mui-icon mui-icon-bars"></span>清除答题数据</a>
+				<a @click="addToCollection" href="javascript:;"><span style="font-size: 14px;" :class="{'mui-icon':true, 'mui-icon-star':!isCollected,'mui-icon-star-filled':isCollected}"></span>收藏</a>
 				<div class="my_submit">
 					<span class="mui-icon mui-icon-checkmarkempty">{{rightCount}}</span>
 					<span class="mui-icon mui-icon-closeempty">{{falseCount}}</span>
@@ -130,7 +131,7 @@
 			</nav>
 
 		</div>
-		<div v-show="phoneModel=='Android'" class="androidCtlBtn" style="position: fixed;bottom: 100px;width: 100%;">
+		<div class="androidCtlBtn" style="position: fixed;bottom: 100px;width: 100%;">
 			<span id="preBtn" @click="preQuestion" class="mui-icon mui-icon-arrowthinleft leftBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: left;margin-left: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
 			<span id="nextBtn" @click="nextQuestion" class="mui-icon mui-icon-arrowthinright rightBtn" style="z-index: 1000;font-size: 50px;border: 1px solid #e2e2e2;border-radius: 35px;float: right;margin-right: 10px;background-color: #e2e2e2;color: white;opacity: 1;"></span>
 		</div>
@@ -159,6 +160,7 @@
 					"pageSize": 1
 				},
 				currentQuestion: {},
+				isCollected: false,
 				isAnswered: false, // 当前试题是否已经被回答
 				answerQuestionIds: [],
 				rightCount: 0,
@@ -258,6 +260,49 @@
 			toIndex: function() {
 				this.$router.push('/')
 			},
+			addToCollection: async function() { // 收藏该题  收藏过得  再次点击就是取消收藏
+				if (!this.isCollected) { // 收藏  
+					var data = {
+						"collectDate": new Date(),
+						"collectUserId": this.$getCookie('userId'),
+						"questionId": this.currentQuestion.id,
+						"questionJobTypeId": this.questionJobTypeSelectedId,
+						"questionTypeId": this.currentQuestion.questionTypeId
+					}
+					this.$http.post('/msbd/addQuestioncollection', data).then(res => {
+						if (res.data.code == 200) {
+							this.$mui.toast('收藏成功')
+							this.isCollected = true
+						} else {
+							this.$mui.toast('收藏失败')
+						}
+					})
+				} else { // 取消收藏
+					// 先查询收藏记录主键id
+					var data = {
+						"model": {
+							"collectUserId": this.$getCookie('userId'),
+							"questionId": this.currentQuestion.id,
+							"questionJobTypeId": this.questionJobTypeSelectedId,
+						},
+						"orderParams": [],
+						"pageNum": 1,
+						"pageSize": 1
+					}
+					var res = await this.$http.post('/msbd/getAllQuestioncollection', data)
+					var id = res.data.content.list[0].id
+					var res2 = await this.$http('/msbd/removeQuestioncollectionById/' + id)
+
+					if (res2.data.code == 200) {
+						this.$mui.toast('取消收藏成功')
+						this.isCollected = false
+					} else {
+						this.$mui.toast('取消收藏失败')
+					}
+				}
+
+
+			},
 			chooseOption: async function(val, e) {
 				if (this.isAnswered == true) {
 					this.$mui.toast('不能再次选择')
@@ -284,7 +329,9 @@
 						//记录到服务器
 						let data1 = {
 							"model": {
-								"questionId": this.currentQuestion.id
+								"questionId": this.currentQuestion.id,
+								"answerUserId": this.$getCookie('userId'),
+								"questionJobTypeId": this.questionJobTypeSelectedId
 							},
 							"orderParams": [],
 							"pageNum": 1,
@@ -321,7 +368,9 @@
 						//记录到服务器
 						let data1 = {
 							"model": {
-								"questionId": this.currentQuestion.id
+								"questionId": this.currentQuestion.id,
+								"answerUserId": this.$getCookie('userId'),
+								"questionJobTypeId": this.questionJobTypeSelectedId
 							},
 							"orderParams": [],
 							"pageNum": 1,
@@ -383,7 +432,9 @@
 							//记录到服务器
 							let data1 = {
 								"model": {
-									"questionId": this.currentQuestion.id
+									"questionId": this.currentQuestion.id,
+									"answerUserId": this.$getCookie('userId'),
+									"questionJobTypeId": this.questionJobTypeSelectedId
 								},
 								"orderParams": [],
 								"pageNum": 1,
@@ -416,7 +467,9 @@
 							//记录到服务器
 							let data1 = {
 								"model": {
-									"questionId": this.currentQuestion.id
+									"questionId": this.currentQuestion.id,
+									"answerUserId": this.$getCookie('userId'),
+									"questionJobTypeId": this.questionJobTypeSelectedId
 								},
 								"orderParams": [],
 								"pageNum": 1,
@@ -444,6 +497,7 @@
 							document.getElementById(rightAnswerArr[i]).innerHTML = '对'
 						}
 						this.isAnswered = true
+						this.tempAnswer = ''
 					}
 				}
 				// 存放到浏览器本地缓存中
@@ -501,6 +555,29 @@
 				this.getQuestion()
 			}
 		},
+		watch: {
+			currentQuestion: function() {
+				// 检测该题是否被收藏
+				var data = {
+					"model": {
+						collectUserId: this.$getCookie('userId'),
+						questionId: this.currentQuestion.id
+					},
+					"orderParams": [],
+					"pageNum": 1,
+					"pageSize": 1
+				}
+				this.$http.post('/msbd/getAllQuestioncollection', data).then(res => {
+					if (res.data.content.total == 0) {
+						// console.log('未收藏')
+						this.isCollected = false
+					} else {
+						// console.log('已收藏')
+						this.isCollected = true
+					}
+				})
+			}
+		},
 		mounted: function() {
 			// mui配置
 			this.$mui.init({
@@ -532,16 +609,16 @@
 			} else {
 				this.phoneModel = 'others'
 				// this.$mui.previewImage();
-				var that = this
-				document.getElementById('question').addEventListener("swiperight", function() {
-					console.log('swiperight')
-					console.log(document.getElementById('options'))
-					that.preQuestion()
-				});
-				document.getElementById('question').addEventListener("swipeleft", function() {
-					console.log('swipeleft')
-					that.nextQuestion()
-				});
+				// var that = this
+				// document.getElementById('question').addEventListener("swiperight", function() {
+				// 	console.log('swiperight')
+				// 	console.log(document.getElementById('options'))
+				// 	that.preQuestion()
+				// });
+				// document.getElementById('question').addEventListener("swipeleft", function() {
+				// 	console.log('swipeleft')
+				// 	that.nextQuestion()
+				// });
 			}
 			// 从浏览器本地缓存中读取用户的答题记录
 			this.localAnswerLog = JSON.parse(localStorage.getItem('localAnswerLog')) || [];

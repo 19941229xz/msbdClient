@@ -79,9 +79,9 @@
 							<div class="mui-media-body">Email</div>
 						</a> -->
 					</li>
-					<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4 no-border">
-						<a href="#">
-							<span class="mui-icon mui-icon-close"></span>
+					<li @click="toWrongPractice" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4 no-border">
+						<a href="javascript:;">
+							<span class="mui-icon mui-icon-close"><span class="mui-badge mui-badge-blue">新功能</span></span>
 							<div class="mui-media-body">我的错题</div>
 						</a>
 					</li>
@@ -115,7 +115,7 @@
 					<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4 no-border">
 						<a href="#">
 							<span class="mui-icon mui-icon-home"></span>
-							<div class="mui-media-body">驾考讲堂</div>
+							<div class="mui-media-body">名师讲堂</div>
 						</a>
 					</li>
 					<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" style="border:none;">
@@ -163,10 +163,10 @@
 						<span class="mui-icon mui-icon-home"><span class="mui-badge mui-badge-blue">新功能</span></span>
 					</a>
 				</li>
-				<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+				<li @click="isCollectionPractice" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="javascript:;">
 						<div class="mui-media-body">我的收藏</div>
-						<span class="mui-icon mui-icon-home"></span>
+						<span class="mui-icon mui-icon-star"><span class="mui-badge mui-badge-blue">新功能</span></span>
 
 					</a>
 				</li>
@@ -179,8 +179,8 @@
 				</li>
 				<li @click="isDeveloping" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#">
-						<div class="mui-media-body">用户中心</div>
-						<span class="mui-icon mui-icon-home"></span>
+						<div class="mui-media-body">我的设置</div>
+						<span class="mui-icon mui-icon-gear"></span>
 					</a>
 				</li>
 			</ul>
@@ -213,9 +213,27 @@
 				// this.$router.push({path:'/login'})
 				this.$mui.toast('开发中敬请期待')
 			},
-			toRankList:function(){
+			toRankList:function(){  // 去排行榜
 				this.$router.push({
 					path:'/rankList',
+					query:{
+						questionJobTypeSelectedId:this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName:this.questionJobTypeSelectedName
+					}
+				})
+			},
+			isCollectionPractice:function(){  //去我的收藏
+				this.$router.push({
+					path:'/collectionPractice',
+					query:{
+						questionJobTypeSelectedId:this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName:this.questionJobTypeSelectedName
+					}
+				})
+			},
+			toWrongPractice:function(){
+				this.$router.push({
+					path:'/wrongPractice',
 					query:{
 						questionJobTypeSelectedId:this.questionJobTypeSelectedId,
 						questionJobTypeSelectedName:this.questionJobTypeSelectedName
@@ -247,13 +265,19 @@
 				this.$http.post('/msbd/getAllQuestionjobtype', searchData).then(res => {
 					if (res.data.code == 200) {
 						this.questionjobtypeList = res.data.content.list
+						// this.questionjobtypeList.splice(2,1)
 						// this.questionJobTypeSelectedId = localStorage.getItem('questionJobTypeId') || this.questionjobtypeList[0].id
 						// this.questionJobTypeSelectedName = localStorage.getItem('questionJobTypeName') || this.questionjobtypeList[0].questionJobTypeName
-						this.questionJobTypeSelectedId = this.questionjobtypeList[0].id
-						this.questionJobTypeSelectedName = this.questionjobtypeList[0].questionJobTypeName
-						// this.question.questionJobTypeId = res.data.content.list[0].id
-						// this.question.questionJobTypeName = res.data.content.list[0].questionJobTypeName
-						this.position = this.questionJobTypeSelectedId
+						if(localStorage.getItem('questionJobTypeSelectedId')==null){
+							this.questionJobTypeSelectedId = this.questionjobtypeList[0].id
+							this.questionJobTypeSelectedName = this.questionjobtypeList[0].questionJobTypeName
+							this.position = this.questionJobTypeSelectedId
+						}else{
+							this.questionJobTypeSelectedId = localStorage.getItem('questionJobTypeSelectedId')
+							this.questionJobTypeSelectedName = localStorage.getItem('questionJobTypeSelectedName')
+							this.position = this.questionJobTypeSelectedId
+						}
+						
 						this.getQuestionCount()
 						this.$log(this.questionjobtypeList)
 						this.$log(res.data)
@@ -261,8 +285,8 @@
 						var localAnswerLogArr = JSON.parse(localStorage.getItem('localAnswerLog')) || []
 						this.questionDone = 0
 						for (var i = 0; i < localAnswerLogArr.length; i++) {
-							console.log(localAnswerLogArr[i].questionTypeId)
-							console.log(this.questionJobTypeSelectedId)
+							// console.log(localAnswerLogArr[i].questionTypeId)
+							// console.log(this.questionJobTypeSelectedId)
 							if (localAnswerLogArr[i].questionTypeId == this.questionJobTypeSelectedId) {
 								this.questionDone++
 							}
@@ -295,6 +319,9 @@
 				this.getQuestionCount()
 				//
 				this.getBestScoreByUserId()
+				//将当前岗位id存放到localstorage
+				localStorage.setItem('questionJobTypeSelectedId',this.questionJobTypeSelectedId)
+				localStorage.setItem('questionJobTypeSelectedName',this.questionJobTypeSelectedName)
 			},
 			getQuestionCount: function() {
 				var that = this

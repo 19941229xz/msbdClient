@@ -1,13 +1,16 @@
 <template>
 
 	<div>
+
+
+
 		<div class="mui-content" style="background-color: inherit">
+			<!-- 标题 -->
 			<div class="mui-content-padded" style="text-indent: 5%;margin-top: 100px;">
 				<h2>您好，请登录</h2>
 			</div>
 
-
-
+			<!-- 登录表单 -->
 			<form class="mui-input-group myform">
 				<div class="mui-input-row" style="height: 80px;">
 					<label style="font-size: 40px;"><span class="mui-icon mui-icon-phone"></span></label>
@@ -25,11 +28,8 @@
 			<!-- <div class="mui-row changeLoginMethod">
 				账号密码登录
 			</div> -->
-
-
-
 		</div>
-
+		<!-- 底部客服栏 -->
 		<nav class="mui-bar mui-bar-tab" style="box-shadow: none;background-color: inherit;text-align: center;font-size: 14px;color: grey;">
 			如无法登录，请点击<span style="font-weight: bold;color: #000000;">账号申诉</span>申请客服协助
 		</nav>
@@ -49,7 +49,7 @@
 				textCode: '', // 短信验证码
 				sendTextCodeTip: '发送验证码',
 				phoneToken: '',
-				sendTextCodeBtnIsDisabled: false,
+				sendTextCodeBtnIsDisabled: false,  // 默认验证码发送按钮可用
 				searchData: {
 					"model": {
 
@@ -151,7 +151,8 @@
 				userInfo.phoneNum = this.phoneNum
 				userInfo.password = '123456'
 				userInfo.userName = this.phoneNum
-				userInfo.status = 3  //  3代表是普通用户  无法使用后台功能
+				userInfo.status = 3 //  3代表是普通用户  无法使用后台功能
+				userInfo.headImg = 'https://vp-saas-common.oss-cn-shenzhen.aliyuncs.com/1566436176212defaultHeadImg.jpg'
 				// this.userInfo.phoneNum = this.phoneNum
 				// this.userInfo.password = '123456'
 				// this.userInfo.userName = this.phoneNum
@@ -159,6 +160,7 @@
 					if (res.data.code == 200) {
 						// alert('test')
 						that.$setCookie('userId', res.data.content.id, 24 * 60 * 60)
+						that.$setCookie('userName', res.data.content.userName, 24 * 60 * 60)
 						that.$setCookie('companyId', res.data.content.companyId, 24 * 60 * 60)
 						that.$setCookie('schoolId', res.data.content.schoolId, 24 * 60 * 60)
 						that.$setCookie('realName', res.data.content.realName, 24 * 60 * 60)
@@ -192,6 +194,7 @@
 				this.$http.post('/user-server/getAllUser', searchData).then(res => {
 					if (res.data.code == 200 && res.data.content.list.length == 1) {
 						this.$setCookie('userId', res.data.content.list[0].id, 24 * 60 * 60)
+						this.$setCookie('userName', res.data.content.list[0].userName, 24 * 60 * 60)
 						this.$setCookie('companyId', res.data.content.list[0].companyId, 24 * 60 * 60)
 						this.$setCookie('schoolId', res.data.content.list[0].schoolId, 24 * 60 * 60)
 						this.$setCookie('realName', res.data.content.list[0].realName, 24 * 60 * 60)

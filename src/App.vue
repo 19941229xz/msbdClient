@@ -16,13 +16,12 @@
 		},
 		methods: {
 			isWexin: function() {
-				let wx = navigator.userAgent.toLowerCase()
-				if (wx.match(/MicroMessenger/i) === 'micromessenger') {
-
-				} else {
-					this.$mui.alert('请使用微信打开页面，否则体验效果不佳', '面试大咖', '知道了', function() {
-
-					})
+				var ua = navigator.userAgent.toLowerCase();
+				// alert(ua)
+				if (ua.match(/MicroMessenger/i) == "micromessenger") {
+					
+				} else{
+					// this.$mui.alert('请使用微信打开，否则体验效果不佳')
 				}
 			}
 		},
@@ -33,15 +32,7 @@
 </script>
 
 <style>
-	/* #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}*/
-
+	/* 路由动画配置 */
 	.fade-enter-active,
 	.fade-leave-avtive {
 		transition: opacity .5s
@@ -51,4 +42,6 @@
 	.fade-leave-to {
 		opacity: 0
 	}
+
+	/*  */
 </style>

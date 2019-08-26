@@ -14,11 +14,12 @@
 						<div class="mui-media-object mui-pull-left">
 							<span class="mui-badge" :class="{'firstScore':0==index,'secondScore':1==index,'thirdScore':2==index}">{{index+1}}</span>
 						</div>
-						<img style="margin-left: 30px;" class="mui-media-object mui-pull-left" :src="item.userHeadImg">
+						<img v-if="item.userHeadImg!=''&&item.userHeadImg!=null&&item.userHeadImg!='null'" style="margin-left: 30px;" class="mui-media-object mui-pull-left" :src="item.userHeadImg">
+						<img v-else style="margin-left: 30px;" class="mui-media-object mui-pull-left" src="../assets/defaultHeadImg.jpg">
 						<div class="mui-media-body">
 							<div style="margin-left: 30px;" class="mui-pull-left">
-								<div v-if="item.userRealName!=''&&item.userRealName!=null">用户{{item.userRealName}}</div>
-								<div v-else-if="item.userNickName!=''&&item.userNickName!=null">用户{{item.userNickName}}</div>
+								<div v-if="item.userRealName!=''&&item.userRealName!=null&&item.userRealName!='null'">用户{{item.userRealName}}</div>
+								<div v-else-if="item.userNickName!=''&&item.userNickName!=null&&item.userNickName!='null'">用户{{item.userNickName}}</div>
 								<div v-else>用户{{item.userName}}</div>
 								<p class="mui-ellipsis">用时：{{item.finishTimeLong | s2hs}}</p>
 							</div>
