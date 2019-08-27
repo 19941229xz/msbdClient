@@ -10,6 +10,11 @@ import exampaperList from '@/components/exampaperList'
 import preTest from '@/components/preTest'
 import wrongPractice from '@/components/wrongPractice'
 import collectionPractice from '@/components/collectionPractice'
+import userSetting from '@/components/userSetting'
+import userEdit from '@/components/userEdit'
+import diffcultList from '@/components/diffcultList'  
+import diffcultPractice from '@/components/diffcultPractice'
+import myGrade from '@/components/myGrade'
 
 
 Vue.use(Router)
@@ -67,6 +72,31 @@ export default new Router({
 			path: '/collectionPractice',
 			name: 'collectionPractice',
 			component: collectionPractice
+		},
+		{
+			path: '/userSetting',
+			name: 'userSetting',
+			component: userSetting
+		},
+		{
+			path: '/userEdit',
+			name: 'userEdit',
+			component: userEdit
+		},
+		{
+			path: '/diffcultList',
+			name: 'diffcultList',
+			component: diffcultList
+		},
+		{
+			path: '/diffcultPractice',
+			name: 'diffcultPractice',
+			component: diffcultPractice
+		},
+		{
+			path: '/myGrade',
+			name: 'myGrade',
+			component: myGrade
 		}
 
 

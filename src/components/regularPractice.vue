@@ -304,14 +304,12 @@
 
 			},
 			chooseOption: async function(val, e) {
+				var that = this
 				if (this.isAnswered == true) {
 					this.$mui.toast('不能再次选择')
 					return
 				}
-				// console.log(e.target.children[0].children[0])
-				// var span = e.target.children[0].children[0]
-				// this.changeSpan = span
-				// span.style.backgroundColor = '#01DBE7'
+				//
 				document.getElementById(val).style.backgroundColor = '#01DBE7'
 				if (this.currentQuestion.questionTypeId == 1 || this.currentQuestion.questionTypeId == 2) { // 单选题和判断提的情况
 					if (this.currentQuestion.rightOption == val) {
@@ -326,6 +324,9 @@
 							isRight: true,
 							questionTypeId: this.questionJobTypeSelectedId
 						})
+						// 更新该题的回答次数和答错次数
+						this.currentQuestion.answeredNum++
+						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 						//记录到服务器
 						let data1 = {
 							"model": {
@@ -365,6 +366,10 @@
 							isRight: false,
 							questionTypeId: this.questionJobTypeSelectedId
 						})
+						// 更新该题的回答次数和答错次数
+						this.currentQuestion.answeredNum++
+						this.currentQuestion.answerIsFalseNum++
+						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 						//记录到服务器
 						let data1 = {
 							"model": {
@@ -429,6 +434,9 @@
 								isRight: true,
 								questionTypeId: this.questionJobTypeSelectedId
 							})
+							// 更新该题的回答次数和答错次数
+							this.currentQuestion.answeredNum++
+							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 							//记录到服务器
 							let data1 = {
 								"model": {
@@ -464,6 +472,10 @@
 								isRight: false,
 								questionTypeId: this.questionJobTypeSelectedId
 							})
+							// 更新该题的回答次数和答错次数
+							this.currentQuestion.answeredNum++
+							this.currentQuestion.answerIsFalseNum++
+							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 							//记录到服务器
 							let data1 = {
 								"model": {

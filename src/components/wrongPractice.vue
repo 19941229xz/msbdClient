@@ -238,6 +238,7 @@
 				this.$router.push('/')
 			},
 			chooseOption: async function(val, e) {
+				var that = this
 				if (this.isAnswered == true) {
 					this.$mui.toast('不能再次选择')
 					return
@@ -254,30 +255,9 @@
 						this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 						this.questionListThisExam[this.questionIndex - 1].answer = val
 						this.questionListThisExam[this.questionIndex - 1].isRight = true
-						//记录到服务器
-						// let data1 = {
-						// 	"model": {
-						// 		"questionId": this.currentQuestion.id
-						// 	},
-						// 	"orderParams": [],
-						// 	"pageNum": 1,
-						// 	"pageSize": 1
-						// }
-						// var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-						// if (res.data.content.total == 0) {
-						// 	let data2 = {
-						// 		"answerDate": new Date(),
-						// 		"answerIsRight": 1,
-						// 		"answerUserId": this.$getCookie('userId'),
-						// 		"questionId": this.currentQuestion.id,
-						// 		"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-						// 		"questionTypeId": this.currentQuestion.questionTypeId
-						// 	}
-						// 	this.$http.post('/msbd/addUseranserquestion', data2)
-						// 	//
-						// }
-						//
-
+						// 更新该题的回答次数和答错次数
+						that.currentQuestion.answeredNum++
+						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 					} else {
 						this.$mui.toast('错误')
 						document.getElementById(val).style.backgroundColor = 'red'
@@ -289,29 +269,10 @@
 						this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 						this.questionListThisExam[this.questionIndex - 1].answer = val
 						this.questionListThisExam[this.questionIndex - 1].isRight = false
-						//记录到服务器
-						// let data1 = {
-						// 	"model": {
-						// 		"questionId": this.currentQuestion.id
-						// 	},
-						// 	"orderParams": [],
-						// 	"pageNum": 1,
-						// 	"pageSize": 1
-						// }
-						// var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-						// if (res.data.content.total == 0) {
-						// 	let data2 = {
-						// 		"answerDate": new Date(),
-						// 		"answerIsRight": 2,
-						// 		"answerUserId": this.$getCookie('userId'),
-						// 		"questionId": this.currentQuestion.id,
-						// 		"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-						// 		"questionTypeId": this.currentQuestion.questionTypeId
-						// 	}
-						// 	this.$http.post('/msbd/addUseranserquestion', data2)
-						// 	//
-						// }
-						//
+						// 更新该题的回答次数和答错次数
+						that.currentQuestion.answeredNum++
+						that.currentQuestion.answerIsFalseNum++
+						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 					}
 					this.isAnswered = true
 					// // 存放到浏览器本地缓存中
@@ -348,29 +309,9 @@
 							this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 							this.questionListThisExam[this.questionIndex - 1].answer = this.tempAnswer
 							this.questionListThisExam[this.questionIndex - 1].isRight = true
-							//记录到服务器
-							// let data1 = {
-							// 	"model": {
-							// 		"questionId": this.currentQuestion.id
-							// 	},
-							// 	"orderParams": [],
-							// 	"pageNum": 1,
-							// 	"pageSize": 1
-							// }
-							// var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-							// if (res.data.content.total == 0) {
-							// 	let data2 = {
-							// 		"answerDate": new Date(),
-							// 		"answerIsRight": 1,
-							// 		"answerUserId": this.$getCookie('userId'),
-							// 		"questionId": this.currentQuestion.id,
-							// 		"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-							// 		"questionTypeId": this.currentQuestion.questionTypeId
-							// 	}
-							// 	this.$http.post('/msbd/addUseranserquestion', data2)
-							// 	//
-							// }
-							//
+							// 更新该题的回答次数和答错次数
+							that.currentQuestion.answeredNum++
+							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 						} else {
 							this.$mui.toast('错误')
 							this.falseCount++
@@ -378,29 +319,10 @@
 							this.questionListThisExam[this.questionIndex - 1].questionId = this.currentQuestion.id
 							this.questionListThisExam[this.questionIndex - 1].answer = this.tempAnswer
 							this.questionListThisExam[this.questionIndex - 1].isRight = false
-							//记录到服务器
-							// let data1 = {
-							// 	"model": {
-							// 		"questionId": this.currentQuestion.id
-							// 	},
-							// 	"orderParams": [],
-							// 	"pageNum": 1,
-							// 	"pageSize": 1
-							// }
-							// var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-							// if (res.data.content.total == 0) {
-							// 	let data2 = {
-							// 		"answerDate": new Date(),
-							// 		"answerIsRight": 2,
-							// 		"answerUserId": this.$getCookie('userId'),
-							// 		"questionId": this.currentQuestion.id,
-							// 		"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-							// 		"questionTypeId": this.currentQuestion.questionTypeId
-							// 	}
-							// 	this.$http.post('/msbd/addUseranserquestion', data2)
-							// 	//
-							// }
-							//
+							// 更新该题的回答次数和答错次数
+							that.currentQuestion.answeredNum++
+							that.currentQuestion.answerIsFalseNum++
+							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
 						}
 						// 显示正确答案
 						var rightAnswerArr = this.currentQuestion.rightOption.split('')
@@ -577,7 +499,7 @@
 				});
 				var data1 = {
 					"model": {
-						userId: this.$getCookie('userId'),
+						answerUserId: this.$getCookie('userId'),
 						answerIsRight: 2,
 						questionJobTypeId: this.questionJobTypeSelectedId
 					},

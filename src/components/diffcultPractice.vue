@@ -4,8 +4,8 @@
 
 		<div id="question" class="mui-content">
 			<header class="header">
-				<a @click="toIndex" href="javascript:;"><span class="mui-icon mui-icon-arrowthinleft"></span></a>
-				<h5>倒计时({{examTime | s2hs}})</h5>
+				<a @click="toDiffcultList" href="javascript:;"><span class="mui-icon mui-icon-arrowthinleft"></span></a>
+				<h5>难题攻克</h5>
 			</header>
 
 			<div class="mui-content-padded">
@@ -120,7 +120,8 @@
 
 
 			<nav class="my_form">
-				<a @click="finishTheExam" href="javascript:;"><span style="font-size: 14px;" class="mui-icon mui-icon-bars"></span>交卷</a>
+
+				<!-- <a @click="removeThisWrongQuestion" href="javascript:;"><span style="font-size: 14px;" class="mui-icon mui-icon-trash"></span>移除</a> -->
 				<a @click="addToCollection" href="javascript:;"><span style="font-size: 14px;" :class="{'mui-icon':true, 'mui-icon-star':!isCollected,'mui-icon-star-filled':isCollected}"></span>收藏</a>
 				<div class="my_submit">
 					<span class="mui-icon mui-icon-checkmarkempty">{{rightCount}}</span>
@@ -145,11 +146,12 @@
 
 
 	export default {
-		name: 'regularPractice',
+		name: 'diffcultPractice',
 		data() {
 			return {
 				questionJobTypeSelectedId: 1,
 				questionJobTypeSelectedName: '',
+				// questionTypeId:1,
 				questionIndex: 1,
 				questionCount: 30, //  默认官方考试  30题  如果题目不够 就显示最大题数
 				examTime: 30 * 60,
@@ -178,75 +180,28 @@
 				questionListThisExam: [], //存放题目和答题记录
 				exampaperId: 0,
 				exampaperName: '',
-				isWithAnswer: true,
-				examTimeOut: null, // 考试定时器
+				isWithAnswer: true
 			}
 		},
 		methods: {
-			finishTheExam: function() {
-				if (this.questionListThisExam.length == this.questionCount) { //  判断是否答题完毕
-					var isFinishAllQuestion = true
-					for (var i = 0; i < this.questionListThisExam.length; i++) {
-						if (this.questionListThisExam[i].answer == '') {
-							isFinishAllQuestion = false
-						}
-					}
-					if (isFinishAllQuestion) { // 做完
-						clearInterval(this.examTimeOut)
-						// 
-						this.$router.push({
-							path: '/testResult',
-							query: {
-								examTimeUsed: this.examTimeUsed,
-								falseCount: this.falseCount,
-								questionCount: this.questionCount,
-								rightCount: this.rightCount,
-								questionJobTypeSelectedId: this.questionJobTypeSelectedId,
-								questionJobTypeSelectedName: this.questionJobTypeSelectedName,
-								exampaperId: this.exampaperId,
-								exampaperName: this.exampaperName
-							}
-						})
-
-					} else { // 没做完
-						var that = this
-						this.$mui.alert('您还有题目没做完，确定交卷么?', '面试大咖', '交卷', function() {
-							clearInterval(that.examTimeOut)
-							that.$router.push({
-								path: '/testResult',
-								query: {
-									examTimeUsed: that.examTimeUsed,
-									falseCount: that.falseCount,
-									questionCount: that.questionCount,
-									rightCount: that.rightCount,
-									questionJobTypeSelectedId: that.questionJobTypeSelectedId,
-									questionJobTypeSelectedName: that.questionJobTypeSelectedName,
-									exampaperId: that.exampaperId,
-									exampaperName: that.exampaperName
-								}
-							})
-						})
-					}
-				} else { //   没做完
-					var that = this
-					this.$mui.alert('您还有题目没做完，确定交卷么?', '面试大咖', '交卷', function() {
-						clearInterval(that.examTimeOut)
-						that.$router.push({
-							path: '/testResult',
-							query: {
-								examTimeUsed: that.examTimeUsed,
-								falseCount: that.falseCount,
-								questionCount: that.questionCount,
-								rightCount: that.rightCount,
-								questionJobTypeSelectedId: that.questionJobTypeSelectedId,
-								questionJobTypeSelectedName: that.questionJobTypeSelectedName,
-								exampaperId: that.exampaperId,
-								exampaperName: that.exampaperName
-							}
-						})
-					})
+			toLogin: function() {
+				this.$router.push({
+					path: '/login'
+				})
+			},
+			removeThisWrongQuestion: async function() {
+				var wrongQuestionId = this.currentQuestion.wrongQuestionId
+				await this.$http('/msbd/removeUseranserquestionById/'+wrongQuestionId)
+				this.questionListThisExam.splice(this.questionIndex-1,1)
+				this.questionCount = this.questionListThisExam.length
+				this.currentQuestion = this.questionListThisExam[this.questionIndex-1]
+				this.$mui.toast('移除成功')
+				
+				//
+				if(this.questionListThisExam.length==0){
+					this.$router.push('/')
 				}
-
+				
 			},
 			getQuestion: async function() { // 一次获取指定数量的试题  questionCount
 				var that = this
@@ -260,7 +215,7 @@
 					questionRandomIndex = numUtil.randomIntNumBeginEnd(1, count)
 				}
 				this.randomIndexArr.push(questionRandomIndex)
-				// console.log(this.randomIndexArr)
+				console.log(this.randomIndexArr)
 				var searchData2 = {
 					"model": {
 						isChecked: 2,
@@ -275,98 +230,18 @@
 				var question = await examnationUtil.getQuestion(searchData2)
 				question.answer = ''
 				this.questionListThisExam.push(question)
-				// console.log(this.questionListThisExam)
+				console.log(this.questionListThisExam)
 				this.currentQuestion = this.questionListThisExam[this.questionIndex - 1]
 				// this.questionListThisExam.push(this.currentQuestion)  //  存放到题目和答题记录表中
 			},
-			toIndex: function() {
-				
-				var that = this
-				// this.$mui.alert('您还有题目没做完，确定交卷么?', '面试大咖', '交卷', function() {
-				// 	clearInterval(that.examTimeOut)
-				// 	that.$router.push({
-				// 		path: '/testResult',
-				// 		query: {
-				// 			examTimeUsed: that.examTimeUsed,
-				// 			falseCount: that.falseCount,
-				// 			questionCount: that.questionCount,
-				// 			rightCount: that.rightCount,
-				// 			questionJobTypeSelectedId: that.questionJobTypeSelectedId,
-				// 			questionJobTypeSelectedName: that.questionJobTypeSelectedName,
-				// 			exampaperId: that.exampaperId,
-				// 			exampaperName: that.exampaperName
-				// 		}
-				// 	})
-				// })
-				
-				var btnArray = ['否', '是'];
-				this.$mui.confirm('您还有题目没做完，确定交卷么?', '面试大咖', btnArray, function(e) {
-					if (e.index == 1) {
-						clearInterval(that.examTimeOut)
-						that.$router.push({
-							path: '/testResult',
-							query: {
-								examTimeUsed: that.examTimeUsed,
-								falseCount: that.falseCount,
-								questionCount: that.questionCount,
-								rightCount: that.rightCount,
-								questionJobTypeSelectedId: that.questionJobTypeSelectedId,
-								questionJobTypeSelectedName: that.questionJobTypeSelectedName,
-								exampaperId: that.exampaperId,
-								exampaperName: that.exampaperName
-							}
-						})
-					} else {
-						that.$mui.toast('继续答题')
+			toDiffcultList: function() {
+				this.$router.push({
+					path: '/diffcultList',
+					query: {
+						questionJobTypeSelectedId: this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName: this.questionJobTypeSelectedName
 					}
 				})
-				
-				// console.log(this.examTimeOut)
-				// clearInterval(this.examTimeOut)
-				// this.$router.push('/')
-			},
-			addToCollection: async function() { // 收藏该题  收藏过得  再次点击就是取消收藏
-				if (!this.isCollected) { // 收藏  
-					var data = {
-						"collectDate": new Date(),
-						"collectUserId": this.$getCookie('userId'),
-						"questionId": this.currentQuestion.id,
-						"questionJobTypeId": this.questionJobTypeSelectedId,
-						"questionTypeId": this.currentQuestion.questionTypeId
-					}
-					this.$http.post('/msbd/addQuestioncollection', data).then(res => {
-						if (res.data.code == 200) {
-							this.$mui.toast('收藏成功')
-							this.isCollected = true
-						} else {
-							this.$mui.toast('收藏失败')
-						}
-					})
-				} else { // 取消收藏
-					// 先查询收藏记录主键id
-					var data = {
-						"model": {
-							"collectUserId": this.$getCookie('userId'),
-							"questionId": this.currentQuestion.id,
-							"questionJobTypeId": this.questionJobTypeSelectedId,
-						},
-						"orderParams": [],
-						"pageNum": 1,
-						"pageSize": 1
-					}
-					var res = await this.$http.post('/msbd/getAllQuestioncollection', data)
-					var id = res.data.content.list[0].id
-					var res2 = await this.$http('/msbd/removeQuestioncollectionById/' + id)
-
-					if (res2.data.code == 200) {
-						this.$mui.toast('取消收藏成功')
-						this.isCollected = false
-					} else {
-						this.$mui.toast('取消收藏失败')
-					}
-				}
-
-
 			},
 			chooseOption: async function(val, e) {
 				var that = this
@@ -389,32 +264,6 @@
 						// 更新该题的回答次数和答错次数
 						that.currentQuestion.answeredNum++
 						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
-						//记录到服务器
-						let data1 = {
-							"model": {
-								"questionId": this.currentQuestion.id,
-								"answerUserId": this.$getCookie('userId'),
-								"questionJobTypeId": this.questionJobTypeSelectedId
-							},
-							"orderParams": [],
-							"pageNum": 1,
-							"pageSize": 1
-						}
-						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-						if (res.data.content.total == 0) {
-							let data2 = {
-								"answerDate": new Date(),
-								"answerIsRight": 1,
-								"answerUserId": this.$getCookie('userId'),
-								"questionId": this.currentQuestion.id,
-								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-								"questionTypeId": this.currentQuestion.questionTypeId
-							}
-							this.$http.post('/msbd/addUseranserquestion', data2)
-							//
-						}
-						//
-
 					} else {
 						this.$mui.toast('错误')
 						document.getElementById(val).style.backgroundColor = 'red'
@@ -430,34 +279,8 @@
 						that.currentQuestion.answeredNum++
 						that.currentQuestion.answerIsFalseNum++
 						this.$http.put('/msbd/updateQuestion',that.currentQuestion)
-						//记录到服务器
-						let data1 = {
-							"model": {
-								"questionId": this.currentQuestion.id,
-								"answerUserId": this.$getCookie('userId'),
-								"questionJobTypeId": this.questionJobTypeSelectedId
-							},
-							"orderParams": [],
-							"pageNum": 1,
-							"pageSize": 1
-						}
-						var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-						if (res.data.content.total == 0) {
-							let data2 = {
-								"answerDate": new Date(),
-								"answerIsRight": 2,
-								"answerUserId": this.$getCookie('userId'),
-								"questionId": this.currentQuestion.id,
-								"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-								"questionTypeId": this.currentQuestion.questionTypeId
-							}
-							this.$http.post('/msbd/addUseranserquestion', data2)
-							//
-						}
-						//
 					}
 					this.isAnswered = true
-					
 					// // 存放到浏览器本地缓存中
 					// localStorage.setItem('localAnswerLog',JSON.stringify(this.localAnswerLog));
 				} else if (this.currentQuestion.questionTypeId == 3) { //  多选题的情况
@@ -495,31 +318,6 @@
 							// 更新该题的回答次数和答错次数
 							that.currentQuestion.answeredNum++
 							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
-							//记录到服务器
-							let data1 = {
-								"model": {
-									"questionId": this.currentQuestion.id,
-									"answerUserId": this.$getCookie('userId'),
-									"questionJobTypeId": this.questionJobTypeSelectedId
-								},
-								"orderParams": [],
-								"pageNum": 1,
-								"pageSize": 1
-							}
-							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-							if (res.data.content.total == 0) {
-								let data2 = {
-									"answerDate": new Date(),
-									"answerIsRight": 1,
-									"answerUserId": this.$getCookie('userId'),
-									"questionId": this.currentQuestion.id,
-									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-									"questionTypeId": this.currentQuestion.questionTypeId
-								}
-								this.$http.post('/msbd/addUseranserquestion', data2)
-								//
-							}
-							//
 						} else {
 							this.$mui.toast('错误')
 							this.falseCount++
@@ -531,31 +329,6 @@
 							that.currentQuestion.answeredNum++
 							that.currentQuestion.answerIsFalseNum++
 							this.$http.put('/msbd/updateQuestion',that.currentQuestion)
-							//记录到服务器
-							let data1 = {
-								"model": {
-									"questionId": this.currentQuestion.id,
-									"answerUserId": this.$getCookie('userId'),
-									"questionJobTypeId": this.questionJobTypeSelectedId
-								},
-								"orderParams": [],
-								"pageNum": 1,
-								"pageSize": 1
-							}
-							var res = await this.$http.post('/msbd/getAllUseranserquestion', data1)
-							if (res.data.content.total == 0) {
-								let data2 = {
-									"answerDate": new Date(),
-									"answerIsRight": 2,
-									"answerUserId": this.$getCookie('userId'),
-									"questionId": this.currentQuestion.id,
-									"questionJobTypeId": this.currentQuestion.questionJobTypeId,
-									"questionTypeId": this.currentQuestion.questionTypeId
-								}
-								this.$http.post('/msbd/addUseranserquestion', data2)
-								//
-							}
-							//
 						}
 						// 显示正确答案
 						var rightAnswerArr = this.currentQuestion.rightOption.split('')
@@ -567,7 +340,6 @@
 						this.tempAnswer = ''
 					}
 				}
-				
 				// 存放到浏览器本地缓存中
 				// localStorage.setItem('localAnswerLog', JSON.stringify(this.localAnswerLog));
 			},
@@ -685,48 +457,110 @@
 				var res = await this.$http('/msbd/getQuestionById/' + id)
 				this.currentQuestion = res.data.content
 			},
-			getQuestionFromExampaper: function() {
-				var data = {
+			addToCollection: async function() { // 收藏该题  收藏过得  再次点击就是取消收藏
+				if (!this.isCollected) { // 收藏  
+					var data = {
+						"collectDate": new Date(),
+						"collectUserId": this.$getCookie('userId'),
+						"questionId": this.currentQuestion.id,
+						"questionJobTypeId": this.questionJobTypeSelectedId,
+						"questionTypeId": this.currentQuestion.questionTypeId
+					}
+					this.$http.post('/msbd/addQuestioncollection', data).then(res => {
+						if (res.data.code == 200) {
+							this.$mui.toast('收藏成功')
+							this.isCollected = true
+						} else {
+							this.$mui.toast('收藏失败')
+						}
+					})
+				} else { // 取消收藏
+					// 先查询收藏记录主键id
+					var data = {
+						"model": {
+							"collectUserId": this.$getCookie('userId'),
+							"questionId": this.currentQuestion.id,
+							"questionJobTypeId": this.questionJobTypeSelectedId,
+						},
+						"orderParams": [],
+						"pageNum": 1,
+						"pageSize": 1
+					}
+					var res = await this.$http.post('/msbd/getAllQuestioncollection', data)
+					var id = res.data.content.list[0].id
+					var res2 = await this.$http('/msbd/removeQuestioncollectionById/' + id)
+			
+					if (res2.data.code == 200) {
+						this.$mui.toast('取消收藏成功')
+						this.isCollected = false
+					} else {
+						this.$mui.toast('取消收藏失败')
+					}
+				}
+			},
+			getWrongQuestionByUserId: async function() {
+				var loadTip = this.$layer.open({
+					type: 2,
+					content: '正在搜集您的错题'
+				});
+				var data1 = {
 					"model": {
-						isChecked: 2,
-						examPaperId: this.exampaperId
+						userId: this.$getCookie('userId'),
+						answerIsRight: 2,
+						questionJobTypeId: this.questionJobTypeSelectedId
 					},
 					"orderParams": [],
 					"pageNum": 1,
 					"pageSize": 1000
 				}
+				var res1 = await this.$http.post('/msbd/getAllUseranserquestion', data1)
+				// 题目数量为0的判断
+				if(res1.data.content.total == 0){
+					this.$layer.close(loadTip)
+					this.$mui.toast('您还没有任何错题')
+					this.$router.push('/')
+					return
+				}
+				var wrongQuestionIdArr = []
+				var tempArr = []  // 存放答题记录主键
+				for (var i = 0; i < res1.data.content.list.length; i++) {
+					wrongQuestionIdArr.push(res1.data.content.list[i].questionId)
+					tempArr.push(res1.data.content.list[i].id)
+				}
+				var tempQuestionArr = []
+				for (var i = 0; i < wrongQuestionIdArr.length; i++) {
+					var wrongQuestionId = wrongQuestionIdArr[i]
+					var res = await this.$http('/msbd/getQuestionById/' + wrongQuestionIdArr[i])
+					res.data.content.wrongQuestionId = tempArr[i]
+					tempQuestionArr.push(res.data.content)
+				}
+				this.currentQuestion = tempQuestionArr[0]
+				this.questionListThisExam = tempQuestionArr
+				this.questionCount = tempQuestionArr.length
+				this.$layer.close(loadTip)
+				// this.$http.post('/msbd/getAllQuestion', data).then(res => {
+				// 	this.questionListThisExam = res.data.content.list
+				// 	this.currentQuestion = this.questionListThisExam[0]
+				// })
+			},
+			getDiffcultQuestionList:function(){
+				var data = {
+					"model": {
+						questionJobTypeId: this.questionJobTypeSelectedId
+					},
+					"orderParams": [
+						'answeredNum asc',
+						'answerIsFalseNum desc'
+				
+					],
+					"pageNum": 1,
+					"pageSize": 30
+				}
 				this.$http.post('/msbd/getAllQuestion', data).then(res => {
 					this.questionListThisExam = res.data.content.list
-					this.currentQuestion = this.questionListThisExam[0]
+					this.questionCount = this.questionListThisExam.length
+					this.currentQuestion = this.questionListThisExam[this.questionIndex-1]
 				})
-			},
-			examTimeWatcher: function() { // 考试时间监控
-				var that = this
-				// this.examTime
-				this.examTimeOut = setInterval(function() {
-					//
-					that.examTime--
-					that.examTimeUsed++
-					if (that.examTime == 0) {
-						//
-						clearInterval(that.examTimeOut)
-						that.$mui.alert('考试时间结束，用时：' + timeUtil.s_to_hs(that.examTimeUsed))
-						//
-						that.$router.push({
-							path: '/testResult',
-							query: {
-								examTimeUsed: that.examTimeUsed,
-								falseCount: that.falseCount,
-								questionCount: that.questionCount,
-								rightCount: that.rightCount,
-								questionJobTypeSelectedId: that.questionJobTypeSelectedId,
-								questionJobTypeSelectedName: that.questionJobTypeSelectedName,
-								exampaperId:that.exampaperId
-							}
-						})
-						//
-					}
-				}, 1000)
 			}
 		},
 		filters: {
@@ -774,28 +608,42 @@
 			// 判断是考试卷还是  官方模拟考试
 			this.questionJobTypeSelectedId = this.$route.query.questionJobTypeSelectedId
 			this.questionJobTypeSelectedName = this.$route.query.questionJobTypeSelectedName
-			if (typeof(this.$route.query.exampaperId) == 'undefined') { //  官方模拟考试
-				// 随机获取三十题
-				this.getQuestion()
-			} else { // 考的是试卷
-				var exampaperId = this.$route.query.exampaperId
-				this.questionCount = this.$route.query.questionCount
-				this.examTime = this.$route.query.examTime
-				this.exampaperId = exampaperId
-				this.exampaperName = this.$route.query.exampaperName
-				this.isWithAnswer = this.$route.query.isWithAnswer
-				this.getQuestionFromExampaper()
-			}
+			this.questionIndex = this.$route.query.questionIndex
+			// if (typeof(this.$route.query.exampaperId) == 'undefined') { //  官方模拟考试
+			// 	// 随机获取三十题
+			// 	this.getQuestion()
+			// } else { // 考的是试卷
+			// 	var exampaperId = this.$route.query.exampaperId
+			// 	this.questionCount = this.$route.query.questionCount
+			// 	this.examTime = this.$route.query.examTime
+			// 	this.exampaperId = exampaperId
+			// 	this.exampaperName = this.$route.query.exampaperName
+			// 	this.isWithAnswer = this.$route.query.isWithAnswer
+			this.getDiffcultQuestionList()
+			// }
+
+
+			// this.getQuestion()
 			// 获取手机型号  iPhone   Android  iPad  适配安卓解决首饰问题
 			console.log(navigator.userAgent)
-			this.phoneModel = 'Android'
-			// 考试时间监控
-			this.examTimeWatcher()
+			if (navigator.userAgent.indexOf('Android') > -1) {
+				this.phoneModel = 'Android'
+			} else {
+				this.phoneModel = 'others'
+			}
 		}
 
 	}
 </script>
 
 <style scoped="scoped">
+	/* .androidCtlBtn .leftBtn{
+		font-size: 100px;
+		border: 1px solid;
+		border-radius: 35px;
+		float: left;
+	} */
+
+
 	@import '../../static/mui/css/question.css'
 </style>

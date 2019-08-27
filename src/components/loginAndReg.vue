@@ -73,7 +73,9 @@
 
 					return
 				}
-
+				
+				// var loadTip = this.$layer.
+				
 				this.$validator.validate().then(async (valid) => {
 					if (!valid) {
 						// do stuff if not valid.
