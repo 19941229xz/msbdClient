@@ -460,7 +460,7 @@
 				for (var i = 0; i < collectionQuestionIdArr.length; i++) {
 					// var collectionQuestionId = collectionQuestionIdArr[i]
 					var res = await this.$http('/msbd/getQuestionById/' + collectionQuestionIdArr[i])
-					res.data.content.collectionQuestionId = tempArr[i]   // 给试题对象新增一个答题记录主键的属性  
+					res.data.content.collectionQuestionId = tempArr[i]   // 给试题对象新增一个答题记录主键的属性
 					tempQuestionArr.push(res.data.content)
 				}
 				this.currentQuestion = tempQuestionArr[0]
@@ -501,7 +501,7 @@
 </script>
 
 <style scoped="scoped">
-	
+
 	@import '../../static/mui/css/question.css'
-	
+
 </style>
