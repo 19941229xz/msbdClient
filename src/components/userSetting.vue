@@ -30,11 +30,11 @@
 						个人信息
 					</a>
 				</li> -->
-				<!-- <li class="mui-table-view-cell">
-					<a class="mui-navigate-right">
+				<li class="mui-table-view-cell">
+					<a href="#/points" class="mui-navigate-right">
 						我的积分
 					</a>
-				</li> -->
+				</li>
 				<!-- <li class="mui-table-view-cell">
 					<a class="mui-navigate-right">
 						会员中心

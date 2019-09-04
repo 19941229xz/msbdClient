@@ -25,7 +25,7 @@
 						</div>
 						<div class="mui-row">
 							<div class="mui-col-sm-6 mui-col-xs-6">
-								<button @click="toIndex" type="button" class="mui-btn  mui-btn-block circleBtn">回到首页</button>
+								<button @click="toIndex" type="button" class="mui-btn  mui-btn-block circleBtn" style="background-color: inherit;">回到首页</button>
 							</div>
 							<div class="mui-col-sm-6 mui-col-xs-6">
 								<button @click="takeExamAgain()" type="button" class="mui-btn  mui-btn-block circleBtn blue">再考一次</button>
@@ -47,7 +47,7 @@
 				</div>
 
 				<div class="mui-content-padded">
-					<h4>基础巩固(开发中)</h4>
+					<h4>相关课程(开发中)</h4>
 				</div>
 
 				<div class="mui-slider">
@@ -105,33 +105,13 @@
 				</div>
 
 				<div class="mui-content-padded">
-					<h4>相关练习资料(开发中)</h4>
+					<h4>相关专题</h4>
 				</div>
 				<ul class="mui-table-view">
-					<li class="mui-table-view-cell mui-media">
+					<li @click="toPreTest(item)" v-for="item in exampaperListPublic" class="mui-table-view-cell mui-media">
 						<a href="javascript:;" class="mui-navigate-right">
-							<!-- <img class="mui-media-object mui-pull-left" src="http:\/\/placehold.it\/40x40"> -->
 							<div class="mui-media-body">
-								幸福
-								<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
-							</div>
-						</a>
-					</li>
-					<li class="mui-table-view-cell mui-media">
-						<a href="javascript:;" class="mui-navigate-right">
-							<!-- <img class="mui-media-object mui-pull-left" src="http:\/\/placehold.it\/40x40"> -->
-							<div class="mui-media-body">
-								木屋
-								<p class="mui-ellipsis">想要这样一间小木屋，夏天挫冰吃瓜，冬天围炉取暖.</p>
-							</div>
-						</a>
-					</li>
-					<li class="mui-table-view-cell mui-media">
-						<a href="javascript:;" class="mui-navigate-right">
-							<!-- <img class="mui-media-object mui-pull-left" src="http:\/\/placehold.it\/40x40"> -->
-							<div class="mui-media-body">
-								CBD
-								<p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p>
+								<p class="mui-ellipsis" style="color: black;">{{item.examPaperName}}</p>
 							</div>
 						</a>
 					</li>
@@ -161,6 +141,7 @@
 				userAnswerCount: 0,
 				exampaperId: 0,
 				exampaperName: '',
+				exampaperListPublic:[],
 			}
 		},
 		methods: {
@@ -364,6 +345,35 @@
 			},
 			toIndex: function() {
 				this.$router.push('/')
+			},
+			getExampaperListPublic: function() {
+				// 
+				var data = {
+					"model": {
+						isChecked: 2,
+						publicLevel: 1,
+						questionJobTypeId: this.questionJobTypeSelectedId
+					},
+					"orderParams": [
+						'checkDate desc'
+			
+					],
+					"pageNum": 1,
+					"pageSize": 1000
+				}
+				this.$http.post('/msbd/getAllExampaper', data).then(res => {
+					this.exampaperListPublic = res.data.content.list
+				})
+			},
+			toPreTest: function(item) {
+				this.$router.push({
+					path: '/preTest',
+					query: {
+						exampaperId: item.id,
+						questionJobTypeSelectedId: this.questionJobTypeSelectedId,
+						questionJobTypeSelectedName: this.questionJobTypeSelectedName
+					}
+				})
 			}
 		},
 		filters: {
@@ -384,6 +394,7 @@
 					release: false //默认为false，不监听
 				}
 			});
+			this.$mui(".mui-slider").slider();
 			// var progressbar1 = this.$mui('#demo1');
 			// this.$mui(progressbar1).progressbar().setProgress(10)
 
@@ -403,6 +414,8 @@
 			this.calTheResult()
 			//
 			this.getUserAnswerCount()
+			//
+			this.getExampaperListPublic()
 		}
 
 	}

@@ -15,6 +15,7 @@ import userEdit from '@/components/userEdit'
 import diffcultList from '@/components/diffcultList'  
 import diffcultPractice from '@/components/diffcultPractice'
 import myGrade from '@/components/myGrade'
+import points from '@/components/points'
 
 
 Vue.use(Router)
@@ -97,6 +98,11 @@ export default new Router({
 			path: '/myGrade',
 			name: 'myGrade',
 			component: myGrade
+		},
+		{
+			path: '/points',
+			name: 'points',
+			component: points
 		}
 
 
