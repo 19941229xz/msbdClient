@@ -16,6 +16,9 @@ import diffcultList from '@/components/diffcultList'
 import diffcultPractice from '@/components/diffcultPractice'
 import myGrade from '@/components/myGrade'
 import points from '@/components/points'
+import courseList from '@/components/courseList'
+import course from '@/components/course'
+import randomPractice from '@/components/randomPractice'
 
 
 Vue.use(Router)
@@ -103,7 +106,22 @@ export default new Router({
 			path: '/points',
 			name: 'points',
 			component: points
-		}
+		},
+    {
+      path: '/courseList',
+      name: 'courseList',
+      component: courseList
+    },
+    {
+      path: '/course',
+      name: 'course',
+      component: course
+    },
+    {
+      path: '/randomPractice',
+      name: 'randomPractice',
+      component: randomPractice
+    }
 
 
 	]

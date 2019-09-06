@@ -9,20 +9,20 @@
 			</header>
 
 			<ul class="mui-table-view mui-grid-view mui-grid-9">
-				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="">
 						<span class="mui-icon">{{jigeTimes}}</span>
 						<div class="mui-media-body">及格次数</div>
 					</a>
 				</li>
-				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="">
 						<span class="mui-icon">{{totalExamTimes}}</span>
 						<div class="mui-media-body">考试次数</div>
 					</a>
 				</li>
-				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="">
 						<span class="mui-icon">{{guessGrade}}</span>
 						<div class="mui-media-body">成绩预测</div>
 					</a>

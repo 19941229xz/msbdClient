@@ -18,7 +18,7 @@
 						<input @change="addImage" id="headImg" type="file" style="display:none;" />
 						<div class="mui-media-body">
 							账号:{{userInfo.userName}} <span class="mui-badge">vip</span>
-							<p class="mui-ellipsis">等级3 积分：1000</p>
+							<p class="mui-ellipsis">等级{{member.memberLevel}} 积分：{{member.points}}</p>
 						</div>
 					</a>
 				</li>
@@ -59,7 +59,8 @@
 		name: 'userSetting',
 		data() {
 			return {
-				userInfo: {}
+				userInfo: {},
+        member:{}
 			}
 		},
 		methods: {
@@ -72,6 +73,9 @@
 			async getUserInfo() {
 				var res = await this.$http('/user-server/getUserById/' + this.$getCookie('userId'))
 				this.userInfo = res.data.content
+
+        var res1 = await this.$http('/user-server/getMemberById/'+this.userInfo.memberId)
+        this.member = res1.data.content
 				// console.log(this.userInfo)
 			},
 			async addImage(e) {

@@ -9,7 +9,7 @@
 			</header>
 
 			<div class="points-top">
-				<div class="points">0积分</div>
+				<div class="points">{{points}}积分</div>
 				<div class="points-rule">1元=100积分</div>
 			</div>
 
